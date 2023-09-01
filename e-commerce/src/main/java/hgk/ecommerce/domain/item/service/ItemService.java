@@ -47,12 +47,12 @@ public class ItemService {
     }
 
     @Transactional
-    public void addItem(Owner owner, ItemSave itemSave) {
+    public Long addItem(Owner owner, ItemSave itemSave) {
         Shop shop = shopService.getShopEntity(owner, itemSave.getShopId());
 
         Item item = Item.createItem(itemSave, shop);
 
-        itemRepository.save(item);
+        return itemRepository.save(item).getId();
     }
 
     @Transactional
@@ -83,7 +83,7 @@ public class ItemService {
     @Transactional
     public void increaseStock(Long itemId, Integer quantity) {
         Item item = itemRepository.findItemWithLock(itemId).orElseThrow(NoSuchElementException::new);
-        item.decreaseStock(quantity);
+        item.increaseStock(quantity);
         itemRepository.saveAndFlush(item);
     }
 

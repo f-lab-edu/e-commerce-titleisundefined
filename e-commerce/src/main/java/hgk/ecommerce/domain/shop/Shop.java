@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
+@Table(name = "shop")
 public class Shop extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
