@@ -48,6 +48,15 @@ public class OwnerService {
         ownerRepository.save(owner);
     }
 
+    @Transactional(readOnly = true)
+    public Owner getCurrentOwner() {
+        Long ownerId = SessionUtils.getSession(httpSession, OWNER);
+
+        return ownerRepository.findById(ownerId).orElseThrow(() -> {
+            throw new AuthorizationException("로그인 후에 진행해주세요.", BAD_REQUEST);
+        });
+    }
+
     //region PRIVATE METHOD
     private void checkDuplicateLoginId(String loginId) {
         if (ownerRepository.existsOwnerByLoginId(loginId) == true) {

@@ -6,6 +6,7 @@ import hgk.ecommerce.domain.user.dto.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import static hgk.ecommerce.domain.user.dto.enums.Status.*;
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@EqualsAndHashCode(of = "id")
 public class User extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

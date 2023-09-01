@@ -6,12 +6,14 @@ import hgk.ecommerce.domain.user.dto.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 public class Owner extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
