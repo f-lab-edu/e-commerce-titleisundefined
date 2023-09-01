@@ -17,13 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ShopService {
     private final ShopRepository shopRepository;
-    private final OwnerService ownerService;
 
     @Transactional(readOnly = true)
     public List<ShopResponse> getOwnShops(Owner owner, Integer page, Integer count) {
