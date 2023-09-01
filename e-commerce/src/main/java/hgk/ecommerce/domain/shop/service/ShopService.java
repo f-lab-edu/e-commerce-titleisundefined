@@ -37,13 +37,7 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public ShopResponse getOwnShopById(Owner owner, Long shopId) {
-        Shop shop = shopRepository.findById(shopId).orElseThrow(() -> {
-            throw new NoResourceException("존재하지 않는 가게 입니다.", HttpStatus.BAD_REQUEST);
-        });
-
-        if(!owner.equals(shop.getOwner()) ) {
-            throw new AuthenticationException("접근 권한이 없습니다.", HttpStatus.BAD_REQUEST);
-        }
+        Shop shop = getShopEntity(owner, shopId);
 
         return new ShopResponse(shop);
     }
@@ -57,7 +51,25 @@ public class ShopService {
         shopRepository.save(shop);
     }
 
+    @Transactional(readOnly = true)
+    public Shop getShopEntity(Owner owner, Long shopId) {
+        Shop shop = shopRepository.findById(shopId).orElseThrow(() -> {
+            throw new NoResourceException("존재하지 않는 가게 입니다.", HttpStatus.BAD_REQUEST);
+        });
+
+        checkShopAuth(owner, shop);
+
+        return shop;
+    }
+
+    @Transactional(readOnly = true)
+    public void checkShopAuth(Owner owner, Shop shop) {
+        if(!owner.getId().equals(shop.getOwner().getId()) ) {
+            throw new AuthenticationException("접근 권한이 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+    }
     //region PRIVATE METHOD
+
     private void checkDuplicateName(String shopName) {
         boolean isExist = shopRepository.existsShopByName(shopName);
         if(isExist) {

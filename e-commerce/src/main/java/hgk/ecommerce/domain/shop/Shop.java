@@ -25,7 +25,7 @@ public class Shop extends EntityBase {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", nullable = false)
     private Owner owner;
 
     public static Shop createShop(ShopSave shopSave, Owner owner) {
