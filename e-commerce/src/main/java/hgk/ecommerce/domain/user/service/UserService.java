@@ -55,6 +55,14 @@ public class UserService {
         });
     }
 
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        Long userId = SessionUtils.getSession(httpSession, USER);
+
+        return userRepository.findById(userId).orElseThrow(() -> {
+            throw new AuthorizationException("로그인 후에 진행해주세요.", BAD_REQUEST);
+        });
+    }
 
     //region PRIVATE METHOD
     private void checkDuplicateLoginId(String loginId) {

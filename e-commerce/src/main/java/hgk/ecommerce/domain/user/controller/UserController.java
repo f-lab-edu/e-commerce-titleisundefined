@@ -3,6 +3,7 @@ package hgk.ecommerce.domain.user.controller;
 import hgk.ecommerce.domain.user.dto.request.UserSign;
 import hgk.ecommerce.domain.user.dto.request.UserLogin;
 import hgk.ecommerce.domain.user.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,12 @@ public class UserController {
     @PostMapping("/sign-up")
     public ResponseEntity signOut(@Valid @RequestBody UserSign userSign) {
         userService.signUp(userSign);
+        return RESPONSE_OK;
+    }
+
+    @DeleteMapping("/log-out")
+    public ResponseEntity logOut(HttpSession session) {
+        session.invalidate();
         return RESPONSE_OK;
     }
 
