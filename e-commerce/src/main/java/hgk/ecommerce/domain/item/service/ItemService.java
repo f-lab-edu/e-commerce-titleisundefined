@@ -75,6 +75,7 @@ public class ItemService {
     public void decreaseStock(Long itemId, Integer quantity) {
         Item item = itemRepository.findItemWithLock(itemId).orElseThrow(NoSuchElementException::new);
 
+        checkItemStatus(item);
         item.decreaseStock(quantity);
 
         itemRepository.saveAndFlush(item);
@@ -83,11 +84,19 @@ public class ItemService {
     @Transactional
     public void increaseStock(Long itemId, Integer quantity) {
         Item item = itemRepository.findItemWithLock(itemId).orElseThrow(NoSuchElementException::new);
+        checkItemStatus(item);
         item.increaseStock(quantity);
         itemRepository.saveAndFlush(item);
     }
 
+
     //region PRIVATE METHOD
+
+    private void checkItemStatus(Item item) {
+        if(!item.getStatus().equals(ItemStatus.ACTIVE)) {
+            throw new InvalidRequest("판매가 중지된 아이템 입니다.", HttpStatus.BAD_REQUEST);
+        }
+    }
 
     private List<Item> getItemsBySearchCond(ItemSearchCond searchCond, Integer page, Integer count) {
         return queryFactory

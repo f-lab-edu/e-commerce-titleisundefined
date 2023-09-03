@@ -30,7 +30,7 @@ public class CartService {
     @Transactional(readOnly = true)
     public List<CartItemResponse> getCartItemResponses(User user) {
         Cart cart = getCart(user);
-        List<CartItem> cartItems = getCartItemsByCart(cart);
+        List<CartItem> cartItems = getCartItemsFetchItemsByCart(cart);
         List<CartItemResponse> cartItemResponses = getCartResponseDto(cartItems);
 
         return cartItemResponses;
@@ -39,7 +39,7 @@ public class CartService {
     @Transactional
     public void addToCart(User user, CartItemSave cartItemSave) {
         Cart cart = getCart(user);
-        List<CartItem> cartItems = getCartItemsByCart(cart);
+        List<CartItem> cartItems = getCartItemsFetchItemsByCart(cart);
 
         Optional<CartItem> optionalCartItem = cartItems.stream()
                 .filter(eqItemPredicate(cartItemSave.getItemId()))
@@ -59,12 +59,6 @@ public class CartService {
             Optional<CartItem> any = cart.getCartItems().stream().filter(a -> a.getId().equals(cartItemId))
                     .findAny();
             any.ifPresent(ci -> cartItemRepository.delete(ci));
-
-//            CartItem cartItem = getCartItem(cartItemId, cart);
-//            Optional<CartItem> byId = cartItemRepository.findById(cartItemId);
-//            if(cartItem != null) {
-//                cartItemRepository.delete(byId.get());
-//            }
         });
 
     }
@@ -81,12 +75,13 @@ public class CartService {
         return cart;
     }
 
+    @Transactional
+    public List<CartItem> getCartItemsFetchItemsByCart(Cart cart) {
+        return cartItemRepository.findCartItemsFetchItemsByCart(cart.getId());
+    }
+
 
     //region PRIVATE METHOD
-
-    private Predicate<CartItem> eqCartItemIdPredicate(Long cartItemId) {
-        return a -> a.getId().equals(cartItemId);
-    }
 
     private List<CartItemResponse> getCartResponseDto(List<CartItem> cartItems) {
         return cartItems.stream().map(CartItemResponse::new)
@@ -95,10 +90,6 @@ public class CartService {
 
     private Predicate<CartItem> eqItemPredicate(Long itemId) {
         return ci -> ci.getItem().getId().equals(itemId);
-    }
-
-    private List<CartItem> getCartItemsByCart(Cart cart) {
-        return cartItemRepository.findCartItemsFetchItemsByCart(cart.getId());
     }
 
     private void createCartItem(CartItemSave cartItemSave, Cart cart) {
