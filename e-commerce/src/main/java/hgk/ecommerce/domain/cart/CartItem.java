@@ -6,6 +6,7 @@ import hgk.ecommerce.domain.item.Item;
 import hgk.ecommerce.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "cart_item")
+@EqualsAndHashCode(of = "id")
 public class CartItem extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +31,6 @@ public class CartItem extends EntityBase {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    @Column(nullable = false)
     private Item item;
 
     public static CartItem createCartItem(Cart cart, Item item, Integer quantity) {

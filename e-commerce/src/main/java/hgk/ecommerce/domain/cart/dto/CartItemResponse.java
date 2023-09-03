@@ -12,11 +12,13 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.*;
 @JsonNaming(SnakeCaseStrategy.class)
 public class CartItemResponse {
     private Long cartItemId;
+    private String itemName;
     private Integer price;
     private Integer quantity;
 
     public CartItemResponse(CartItem cartItem) {
         Item item = cartItem.getItem();
+        this.itemName = item.getName();
         this.cartItemId = cartItem.getId();
         this.price = item.getPrice();
         this.quantity = cartItem.getQuantity();

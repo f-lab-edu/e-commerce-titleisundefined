@@ -1,10 +1,12 @@
 package hgk.ecommerce.domain.cart;
 
 import hgk.ecommerce.domain.common.entity.EntityBase;
+import hgk.ecommerce.domain.item.Item;
 import hgk.ecommerce.domain.user.User;
 import jakarta.persistence.*;
 import jdk.jshell.spi.ExecutionControl;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.Optional;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "cart")
+@EqualsAndHashCode(of = "id")
 public class Cart extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +30,7 @@ public class Cart extends EntityBase {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cart")
     private List<CartItem> cartItems = new ArrayList<>();
 
     public static Cart createCart(User user) {
@@ -36,35 +39,35 @@ public class Cart extends EntityBase {
         return cart;
     }
 
-    @Transactional
-    public void addCartItem(CartItem cartItem) {
-        Optional<CartItem> optionalCartItem = findCartItem(cartItem);
-
-        if(optionalCartItem.isPresent()) {
-            CartItem currentCartItem = optionalCartItem.get();
-            currentCartItem.increaseQuantity(cartItem.getQuantity());
-        } else {
-            cartItems.add(cartItem);
-        }
-    }
-
-    // TODO : Decrease Method 구현 필요
-
-    public void removeCartItem(Long cartItemId) {
-        this.cartItems.removeIf(ci -> ci.getId().equals(cartItemId));
-    }
-
-    private Optional<CartItem> getCartItem(CartItem cartItem) {
-        Optional<CartItem> optionalCartItem = cartItems.stream()
-                .filter(ci -> ci.getId().equals(cartItem.getId()))
-                .findAny();
-        return optionalCartItem;
-    }
-
-    private Optional<CartItem> findCartItem(CartItem cartItem) {
-        return this.cartItems
-                .stream()
-                .filter(ci -> ci.getItem().getId().equals(cartItem.getItem().getId()))
-                .findAny();
-    }
+//    @Transactional
+//    public void addCartItem(CartItem cartItem) {
+//        Optional<CartItem> optionalCartItem = findCartItem(cartItem);
+//
+//        if(optionalCartItem.isPresent()) {
+//            CartItem currentCartItem = optionalCartItem.get();
+//            currentCartItem.increaseQuantity(cartItem.getQuantity());
+//        } else {
+//            cartItems.add(cartItem);
+//        }
+//    }
+//
+//    // TODO : Decrease Method 구현 필요
+//
+//    public void removeCartItem(Long cartItemId) {
+//        this.cartItems.removeIf(ci -> ci.getId().equals(cartItemId));
+//    }
+//
+//    private Optional<CartItem> getCartItem(CartItem cartItem) {
+//        Optional<CartItem> optionalCartItem = cartItems.stream()
+//                .filter(ci -> ci.getId().equals(cartItem.getId()))
+//                .findAny();
+//        return optionalCartItem;
+//    }
+//
+//    private Optional<CartItem> findCartItem(CartItem cartItem) {
+//        return this.cartItems
+//                .stream()
+//                .filter(ci -> ci.getItem().getId().equals(cartItem.getItem().getId()))
+//                .findAny();
+//    }
 }
