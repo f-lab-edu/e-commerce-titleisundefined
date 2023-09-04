@@ -5,6 +5,7 @@ import hgk.ecommerce.domain.cart.CartItem;
 import hgk.ecommerce.domain.cart.service.CartService;
 import hgk.ecommerce.domain.common.exception.AuthenticationException;
 import hgk.ecommerce.domain.common.exception.InvalidRequest;
+import hgk.ecommerce.domain.common.exception.NoResourceException;
 import hgk.ecommerce.domain.item.Item;
 import hgk.ecommerce.domain.item.service.ItemService;
 import hgk.ecommerce.domain.order.Order;
@@ -16,6 +17,7 @@ import hgk.ecommerce.domain.order.repository.OrderItemRepository;
 import hgk.ecommerce.domain.order.repository.OrderRepository;
 import hgk.ecommerce.domain.payment.service.PaymentService;
 import hgk.ecommerce.domain.user.User;
+import hgk.ecommerce.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -75,8 +77,26 @@ public class OrderService {
         paymentService.chargePoint(user, totalPrice);
     }
 
+    @Transactional(readOnly = true)
+    public OrderItem findOrderItemFetchItem(User user, Long orderItemId) {
+        OrderItem orderItem = orderItemRepository.findOrderItemFetchItemById(orderItemId).orElseThrow(() -> {
+            throw new AuthenticationException("주문 내역을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+        });
+
+        checkAuthOrderItem(user, orderItem);
+
+        return orderItem;
+    }
+
+
 
     //region PRIVATE METHOD
+
+    private void checkAuthOrderItem(User user, OrderItem orderItem) {
+        if(!orderItem.getOrder().getUser().getId().equals(user.getId())) {
+            throw new AuthenticationException("접근 권한이 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+    }
 
     private List<OrderResponse> ordersToOrderResponses(List<Order> orders) {
         return orders.stream().map(OrderResponse::new).toList();

@@ -10,10 +10,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    @Query("select i from Item i join fetch i.shop where i.id = :itemId")
-    Optional<Item> findItemFetchShop(@Param("itemId") Long itemId);
-
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from Item i where i.id = :itemId")
     Optional<Item> findItemWithLock(@Param("itemId") Long itemId);
+
 }
