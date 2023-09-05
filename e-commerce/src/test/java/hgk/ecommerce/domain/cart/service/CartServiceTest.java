@@ -1,12 +1,9 @@
 package hgk.ecommerce.domain.cart.service;
 
 import hgk.ecommerce.domain.cart.Cart;
-import hgk.ecommerce.domain.cart.CartItem;
 import hgk.ecommerce.domain.cart.dto.CartItemResponse;
 import hgk.ecommerce.domain.cart.dto.CartItemSave;
-import hgk.ecommerce.domain.cart.repository.CartItemRepository;
 import hgk.ecommerce.domain.item.Item;
-import hgk.ecommerce.domain.item.dto.Category;
 import hgk.ecommerce.domain.item.dto.ItemSave;
 import hgk.ecommerce.domain.item.repository.ItemRepository;
 import hgk.ecommerce.domain.owner.Owner;
@@ -20,7 +17,6 @@ import hgk.ecommerce.domain.user.dto.request.UserSign;
 import hgk.ecommerce.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import static hgk.ecommerce.domain.item.dto.Category.*;
 import static org.assertj.core.api.Assertions.*;
@@ -185,7 +178,7 @@ class CartServiceTest {
     }
 
     private Item createItem(Shop shop, String itemName) {
-        ItemSave itemSave = new ItemSave(itemName, 100000, 10000, ALBUM, shop.getId());
+        ItemSave itemSave = new ItemSave(itemName, 100000, 10000, ELECTRONIC, shop.getId());
         Item item = Item.createItem(itemSave, shop);
         return itemRepository.save(item);
     }

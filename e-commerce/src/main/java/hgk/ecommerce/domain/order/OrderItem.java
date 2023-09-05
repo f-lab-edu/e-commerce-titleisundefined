@@ -28,7 +28,7 @@ public class OrderItem extends EntityBase {
     private Integer quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "orders_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @OneToOne(fetch = FetchType.LAZY)

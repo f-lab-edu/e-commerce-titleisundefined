@@ -20,7 +20,7 @@ import java.util.List;
 public class Order extends EntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "orders_id")
+    @Column(name = "order_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)

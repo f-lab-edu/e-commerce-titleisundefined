@@ -35,6 +35,8 @@ class UserServiceTest {
     void beforeEach() {
         User user = User.createUser(new UserSign("test-user", "test-password", "test-nickname", "test-address"));
         userRepository.save(user);
+        em.flush();
+        em.clear();
     }
 
     //region 로그인 테스트

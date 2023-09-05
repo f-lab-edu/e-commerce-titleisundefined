@@ -13,23 +13,18 @@ import hgk.ecommerce.domain.shop.dto.request.ShopSave;
 import hgk.ecommerce.domain.shop.repository.ShopRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 
 import static hgk.ecommerce.domain.item.dto.ItemStatus.*;
 import static org.assertj.core.api.Assertions.*;
@@ -69,7 +64,7 @@ class ItemServiceTest {
     //region 상품 등록
     @Test
     void 정상_등록() {
-        Category category = Category.ALBUM;
+        Category category = Category.ELECTRONIC;
         int price = 100000;
         int stock = 10;
         String itemName = "test-item";
@@ -91,7 +86,7 @@ class ItemServiceTest {
 
     @Test
     void 타인가게_등록() {
-        Category category = Category.ALBUM;
+        Category category = Category.ELECTRONIC;
         int price = 100000;
         int stock = 10;
         String itemName = "test-item";
@@ -103,7 +98,7 @@ class ItemServiceTest {
 
     @Test
     void 존재하지않는_가게_등록() {
-        Category category = Category.ALBUM;
+        Category category = Category.ELECTRONIC;
         int price = 100000;
         int stock = 10;
         String itemName = "test-item";
@@ -119,21 +114,18 @@ class ItemServiceTest {
     void 카테고리_조회() {
         int loop = 10;
         ArrayList<ItemSave> itemSaves = new ArrayList<>();
+        ItemSearchCond searchCond = new ItemSearchCond(null, Category.ELECTRONIC);
+        int before = itemService.getItems(searchCond, 1, 100).size();
         for (int i = 0; i < loop; i++) {
-            ItemSave itemSave = new ItemSave("item-" + i, i, i, Category.ALBUM, shopA.getId());
+            ItemSave itemSave = new ItemSave("item-" + i, i, i, Category.ELECTRONIC, shopA.getId());
             itemService.addItem(ownerA, itemSave);
             itemSaves.add(itemSave);
         }
         em.flush();
         em.clear();
 
-        ItemSearchCond searchCond1 = new ItemSearchCond(null, Category.ALBUM);
-        assertThat(itemService.getItems(searchCond1, 1, 5).size()).isEqualTo(5);
-        assertThat(itemService.getItems(searchCond1, 1, 10).size()).isEqualTo(10);
-        assertThat(itemService.getItems(searchCond1, 1, 11).size()).isEqualTo(10);
 
-        ItemSearchCond searchCond2 = new ItemSearchCond(null, Category.ETC);
-        assertThat(itemService.getItems(searchCond2, 1, 5).size()).isEqualTo(0);
+        assertThat(itemService.getItems(searchCond, 1, 100).size()).isEqualTo(before + loop);
     }
 
     @Test
@@ -141,7 +133,7 @@ class ItemServiceTest {
         int loop = 10;
         ArrayList<ItemSave> itemSaves = new ArrayList<>();
         for (int i = 0; i < loop; i++) {
-            ItemSave itemSave = new ItemSave("item-" + i, i, i, Category.ALBUM, shopA.getId());
+            ItemSave itemSave = new ItemSave("item-" + i, i, i, Category.ELECTRONIC, shopA.getId());
             itemService.addItem(ownerA, itemSave);
             itemSaves.add(itemSave);
         }
@@ -159,19 +151,19 @@ class ItemServiceTest {
         int loop = 10;
         ArrayList<ItemSave> itemSaves = new ArrayList<>();
         for (int i = 0; i < loop; i++) {
-            ItemSave itemSave = new ItemSave("item-" + i, i, i, Category.ALBUM, shopA.getId());
+            ItemSave itemSave = new ItemSave("item-" + i, i, i, Category.ELECTRONIC, shopA.getId());
             itemService.addItem(ownerA, itemSave);
             itemSaves.add(itemSave);
         }
         em.flush();
         em.clear();
 
-        ItemSearchCond searchCond1 = new ItemSearchCond("item", Category.ALBUM);
+        ItemSearchCond searchCond1 = new ItemSearchCond("item", Category.ELECTRONIC);
         assertThat(itemService.getItems(searchCond1, 1, 5).size()).isEqualTo(5);
         assertThat(itemService.getItems(searchCond1, 1, 10).size()).isEqualTo(10);
         assertThat(itemService.getItems(searchCond1, 1, 11).size()).isEqualTo(10);
 
-        ItemSearchCond searchCond2 = new ItemSearchCond("itemd", Category.ALBUM);
+        ItemSearchCond searchCond2 = new ItemSearchCond("itemd", Category.ELECTRONIC);
         assertThat(itemService.getItems(searchCond2, 1, 5).size()).isEqualTo(0);
 
         ItemSearchCond searchCond3 = new ItemSearchCond("item", Category.ETC);
@@ -183,7 +175,7 @@ class ItemServiceTest {
     //region 상품 수정
     @Test
     void 정상_수정() {
-        Category category = Category.ALBUM;
+        Category category = Category.ELECTRONIC;
         int price = 100000;
         int stock = 10;
         String itemName = "test-item";
@@ -210,7 +202,7 @@ class ItemServiceTest {
 
     @Test
     void 타인_아이템_수정() {
-        Category category = Category.ALBUM;
+        Category category = Category.ELECTRONIC;
         int price = 100000;
         int stock = 10;
         String itemName = "test-item";
@@ -246,7 +238,7 @@ class ItemServiceTest {
             Owner owner = createOwner("test-owner-concurrent-1", "test-password");
             Shop shop = createShop("test-concurrent-1", owner);
 
-            Category category = Category.ALBUM;
+            Category category = Category.ELECTRONIC;
             int price = 100000;
             int stock = 1000;
             String itemName = "test-item";
@@ -308,7 +300,7 @@ class ItemServiceTest {
             Owner owner = createOwner("test-owner-concurrent-2", "test-password");
             Shop shop = createShop("test-concurrent-2", owner);
 
-            Category category = Category.ALBUM;
+            Category category = Category.ELECTRONIC;
             int price = 100000;
             int stock = 1000;
             String itemName = "test-item";

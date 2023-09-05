@@ -11,7 +11,6 @@ import hgk.ecommerce.domain.item.dto.ItemEdit;
 import hgk.ecommerce.domain.item.dto.ItemSave;
 import hgk.ecommerce.domain.item.dto.ItemStatus;
 import hgk.ecommerce.domain.item.repository.ItemRepository;
-import hgk.ecommerce.domain.order.dto.OrderItemResponse;
 import hgk.ecommerce.domain.order.dto.OrderResponse;
 import hgk.ecommerce.domain.owner.Owner;
 import hgk.ecommerce.domain.owner.dto.OwnerSign;
@@ -35,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static hgk.ecommerce.domain.item.dto.Category.ALBUM;
+import static hgk.ecommerce.domain.item.dto.Category.ELECTRONIC;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -218,7 +217,7 @@ class OrderServiceTest {
     }
 
     private Item createItem(Shop shop, String itemName) {
-        ItemSave itemSave = new ItemSave(itemName, 100, 1000, ALBUM, shop.getId());
+        ItemSave itemSave = new ItemSave(itemName, 100, 1000, ELECTRONIC, shop.getId());
         Item item = Item.createItem(itemSave, shop);
         return itemRepository.save(item);
     }

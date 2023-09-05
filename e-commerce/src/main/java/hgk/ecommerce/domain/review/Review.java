@@ -43,6 +43,7 @@ public class Review extends EntityBase {
     private OrderItem orderItem;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "review_status")
     ReviewStatus status;
 
     public static Review createReview(User user, Item item, OrderItem orderItem, ReviewSave reviewSave) {

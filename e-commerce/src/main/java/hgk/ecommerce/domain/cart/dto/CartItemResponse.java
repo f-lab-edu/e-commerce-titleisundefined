@@ -9,7 +9,7 @@ import lombok.Getter;
 import static com.fasterxml.jackson.databind.PropertyNamingStrategies.*;
 
 @Getter
-@JsonNaming(SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
 public class CartItemResponse {
     private Long cartItemId;
     private String itemName;

@@ -14,8 +14,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
-@PropertySource("classpath:application-redis.properties")
+//@Configuration
+//@PropertySource("classpath:application-redis.properties")
 public class RedisConfiguration {
 
     @Value("${spring.session.redis.host}")

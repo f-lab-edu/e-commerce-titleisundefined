@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Configuration
+//@Configuration
 public class DataSourceConfiguration {
     private static final String MASTER_DATASOURCE = "masterDataSource";
     private static final String SLAVE_DATASOURCE = "slaveDataSource";
