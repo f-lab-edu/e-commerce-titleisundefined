@@ -12,7 +12,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class OwnerSign {
     @NotBlank(message = "로그인 아이디는 공백일 수 없습니다.")
     private String loginId;

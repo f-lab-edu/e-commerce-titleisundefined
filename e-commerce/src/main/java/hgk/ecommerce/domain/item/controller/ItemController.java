@@ -22,7 +22,7 @@ public class ItemController {
 
     @GetMapping(value = "/search", produces = "application/json; charset=utf8")
     public List<ItemResponse> getItems(
-            @Valid ItemSearchCond searchCond,
+            @RequestBody @Valid ItemSearchCond searchCond,
             @RequestParam(defaultValue = "1", required = false) Integer page,
             @RequestParam(defaultValue = "5", required = false) Integer count
     ) {
