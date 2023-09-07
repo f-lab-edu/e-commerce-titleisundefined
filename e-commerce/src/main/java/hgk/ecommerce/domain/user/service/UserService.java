@@ -47,11 +47,10 @@ public class UserService {
     }
 
     @Transactional
-    public void delete() {
-        Long userId = SessionUtils.getSession(httpSession, USER);
+    public void delete(User user) {
 
-        userRepository.findById(userId).ifPresent((user) -> {
-            user.deleteUser();
+        userRepository.findById(user.getId()).ifPresent((foundUser) -> {
+            foundUser.deleteUser();
         });
     }
 

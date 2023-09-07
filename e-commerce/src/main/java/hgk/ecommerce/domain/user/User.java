@@ -27,7 +27,7 @@ public class User extends EntityBase {
     @Column(name = "login_id", length = 50, unique = true)
     private String loginId;
 
-    @Column(length = 50)
+    @Column(length = 100)
     @NotNull
     private String password;
 
@@ -37,11 +37,11 @@ public class User extends EntityBase {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(length = 10)
+    @Column(length = 30)
     private Status status;
 
     @NotNull
-    @Column(length = 50)
+    @Column(length = 100)
     private String address;
 
     public static User createUser(UserSign userSign) {
