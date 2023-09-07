@@ -2,6 +2,7 @@ package hgk.ecommerce.domain.payment.service;
 
 import hgk.ecommerce.domain.common.exception.InvalidRequest;
 import hgk.ecommerce.domain.payment.Payment;
+import hgk.ecommerce.domain.payment.dto.PointResponse;
 import hgk.ecommerce.domain.payment.repository.PaymentRepository;
 import hgk.ecommerce.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,14 @@ import java.util.Optional;
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+
+
+    @Transactional(readOnly = true)
+    public PointResponse getPoint(User user) {
+        Payment payment = getPaymentByUser(user);
+
+        return new PointResponse(payment);
+    }
 
     @Transactional
     public void chargePoint(User user, Integer point) {
@@ -33,7 +42,7 @@ public class PaymentService {
 
     @Transactional
     public Payment getPaymentByUser(User user) {
-        Payment payment = paymentRepository.findPaymentByUser(user).orElse(null);
+        Payment payment = paymentRepository.findPaymentByUserId(user.getId()).orElse(null);
         if(payment == null) {
             payment = Payment.createPayment(user);
             return paymentRepository.save(payment);
