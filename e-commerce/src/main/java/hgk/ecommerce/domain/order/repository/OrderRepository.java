@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Query("select o from Order o join fetch o.orderItems where o.id = :orderId")
+    @Query("select o from Order o join fetch o.orderItems oi join fetch oi.item where o.id = :orderId")
     Optional<Order> findOrderFetchItems(@Param("orderId") Long orderId);
 
     List<Order> findOrdersByUser(User user, Pageable pageable);
-
-    Optional<Order> findOrderByOrderItems(OrderItem orderItem);
 }
