@@ -113,7 +113,7 @@ public class ItemService {
     }
 
     private BooleanExpression titleCond(String title) {
-        return title != null ? QItem.item.name.contains(title) : null;
+        return title != null ? QItem.item.name.like(title + "%") : null;
     }
 
     //endregion
