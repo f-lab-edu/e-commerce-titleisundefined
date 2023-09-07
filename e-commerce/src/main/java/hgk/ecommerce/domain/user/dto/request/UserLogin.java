@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 
 @Getter
-@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserLogin {

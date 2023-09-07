@@ -1,5 +1,7 @@
 package hgk.ecommerce.domain.user.controller;
 
+import hgk.ecommerce.domain.common.annotation.AuthCheck;
+import hgk.ecommerce.domain.user.User;
 import hgk.ecommerce.domain.user.dto.request.UserSign;
 import hgk.ecommerce.domain.user.dto.request.UserLogin;
 import hgk.ecommerce.domain.user.service.UserService;
@@ -24,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity signOut(@Valid @RequestBody UserSign userSign) {
+    public ResponseEntity signUp(@Valid @RequestBody UserSign userSign) {
         userService.signUp(userSign);
         return RESPONSE_OK;
     }
@@ -35,9 +37,9 @@ public class UserController {
         return RESPONSE_OK;
     }
 
-    @DeleteMapping
-    public ResponseEntity signOut() {
-        userService.delete();
+    @DeleteMapping("sign-out")
+    public ResponseEntity signOut(@AuthCheck User user) {
+        userService.delete(user);
         return RESPONSE_OK;
     }
 }

@@ -11,7 +11,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategies.*;
 
 @Getter
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @NoArgsConstructor
 public class UserSign {
     @NotBlank(message = "로그인 아이디는 공백일 수 없습니다.")
