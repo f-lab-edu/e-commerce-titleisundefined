@@ -47,7 +47,7 @@ public class CartService {
 
         optionalCartItem.ifPresentOrElse(
                 (ci) -> ci.increaseQuantity(cartItemSave.getQuantity()),    // 존재할 경우 수량 증가
-                () -> createCartItem(cartItemSave, cart)                    // 존재하지 않을 경우 카트에 츠가;
+                () -> createCartItem(cartItemSave, cart)                    // 존재하지 않을 경우 카트에 추가;
         );
     }
 

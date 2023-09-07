@@ -5,6 +5,7 @@ import hgk.ecommerce.domain.cart.dto.CartItemSave;
 import hgk.ecommerce.domain.cart.service.CartService;
 import hgk.ecommerce.domain.common.annotation.AuthCheck;
 import hgk.ecommerce.domain.user.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class CartController {
     }
 
     @PostMapping
-    public void addCartItem(@AuthCheck User user, CartItemSave cartItemSave) {
+    public void addCartItem(@AuthCheck User user, @RequestBody @Valid CartItemSave cartItemSave) {
         cartService.addToCart(user, cartItemSave);
     }
 
