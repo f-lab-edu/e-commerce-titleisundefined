@@ -1,3 +1,7 @@
 
 e-commerce/src/main/generated/*
 .DS_Store
+e-commerce/src/main/resources/application-storage.properties
+e-commerce/src/main/resources/application-storage.properties
+e-commerce/src/main/resources/application-redis.properties
+e-commerce/src/main/resources/application.properties
