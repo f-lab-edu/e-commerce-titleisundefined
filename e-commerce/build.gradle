@@ -25,6 +25,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation 'org.mindrot:jbcrypt:0.4'
     //query dsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
@@ -33,11 +35,20 @@ dependencies {
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'
+    //mysq
+    implementation 'com.mysql:mysql-connector-j:8.0.33'
 
+    //Amazon Api
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.238'
+
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24'
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
