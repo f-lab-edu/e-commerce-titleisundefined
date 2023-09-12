@@ -16,7 +16,7 @@ import static hgk.ecommerce.domain.common.dto.MyResponse.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/owner")
+@RequestMapping("/owners")
 public class OwnerController {
     private final OwnerService ownerService;
 

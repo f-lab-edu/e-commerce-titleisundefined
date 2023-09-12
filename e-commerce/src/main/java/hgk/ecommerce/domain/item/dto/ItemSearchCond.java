@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ItemSearchCond {
     private String title;
-    private Category category;
+    private String category;
 }

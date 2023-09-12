@@ -1,16 +1,15 @@
 package hgk.ecommerce.domain.item.controller;
 
 import hgk.ecommerce.domain.common.annotation.AuthCheck;
-import hgk.ecommerce.domain.common.exception.InvalidRequest;
-import hgk.ecommerce.domain.item.dto.ItemEdit;
-import hgk.ecommerce.domain.item.dto.ItemResponse;
-import hgk.ecommerce.domain.item.dto.ItemSave;
-import hgk.ecommerce.domain.item.dto.ItemSearchCond;
+import hgk.ecommerce.domain.item.dto.*;
 import hgk.ecommerce.domain.item.service.ItemService;
 import hgk.ecommerce.domain.owner.Owner;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,18 +23,27 @@ public class ItemController {
     public List<ItemResponse> getItems(
             @RequestBody @Valid ItemSearchCond searchCond,
             @RequestParam(defaultValue = "1", required = false) Integer page,
-            @RequestParam(defaultValue = "5", required = false) Integer count
+            @RequestParam(defaultValue = "5", required = false) Integer size
     ) {
-        return itemService.getItems(searchCond, page , count);
+        return itemService.getItems(searchCond, page, size);
     }
 
-    @GetMapping("/{id}")
-    public ItemResponse getItem(@PathVariable Long id) {
-        return itemService.getItem(id);
+    @GetMapping("/{itemId}")
+    public ItemResponse getItem(@PathVariable Long itemId) {
+        ItemResponseDetail item = itemService.getItem(itemId);
+        return item;
+    }
+
+    @GetMapping("/{shopId}/list")
+    public List<? extends ItemResponse> getShopItems(@AuthCheck Owner owner,
+                                           @PathVariable Long shopId,
+                                           @RequestParam(defaultValue = "1", required = false) Integer page,
+                                           @RequestParam(defaultValue = "5", required = false) Integer size) {
+        return itemService.getShopItems(owner, shopId, page, size);
     }
 
     @PostMapping
-    public void registerItem(@AuthCheck Owner owner, @Valid @RequestBody ItemSave itemSave) {
+    public void registerItem(@AuthCheck Owner owner, @Valid ItemSave itemSave) {
         itemService.addItem(owner, itemSave);
     }
 

@@ -14,26 +14,26 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-//@Configuration
-//@PropertySource("classpath:application-redis.properties")
+@Configuration
+@PropertySource("classpath:application-redis.properties")
 public class RedisConfiguration {
 
     @Value("${spring.session.redis.host}")
     private String redisHost;
-
+//
     @Value("${spring.session.redis.port}")
     private int redisPort;
-
+//
     @Value("${spring.session.redis.password}")
     private String sessionRedisPassword;
 
-    @Value("${cache.redis.host}")
+//    @Value("${cache.redis.host}")
     private String cacheRedisHost;
 
-    @Value("${cache.redis.port}")
+//    @Value("${cache.redis.port}")
     private int cacheRedisPort;
 
-    @Value("${cache.redis.password}")
+//    @Value("${cache.redis.password}")
     private String cacheRedisPassword;
 
 
@@ -50,7 +50,7 @@ public class RedisConfiguration {
         return lettuceConnectionFactory;
     }
 
-    @Bean(name = "redisCacheFactory")
+//    @Bean(name = "redisCacheFactory")
     public RedisConnectionFactory redisCacheConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(cacheRedisHost);
@@ -75,7 +75,7 @@ public class RedisConfiguration {
         return stringRedisTemplate;
     }
 
-    @Bean
+//    @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisCacheConnectionFactory());
