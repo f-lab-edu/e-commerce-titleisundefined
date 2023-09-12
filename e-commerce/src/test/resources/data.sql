@@ -18,8 +18,8 @@ CREATE TABLE users
     nickname VARCHAR(50) NOT NULL,
     status   VARCHAR(10) NOT NULL,
     address  VARCHAR(50) NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6)
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6)
 );
 
 CREATE TABLE owners
@@ -27,8 +27,8 @@ CREATE TABLE owners
     owner_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     login_id VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6)
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6)
 );
 
 CREATE TABLE shop
@@ -36,8 +36,8 @@ CREATE TABLE shop
     shop_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
     name     VARCHAR(100) NOT NULL UNIQUE,
     owner_id BIGINT       NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (owner_id) REFERENCES owners (owner_id)
 );
 
@@ -50,8 +50,8 @@ CREATE TABLE items
     status   VARCHAR(255) NOT NULL,
     category VARCHAR(255) NOT NULL,
     shop_id  BIGINT       NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (shop_id) REFERENCES shop (shop_id)
 );
 
@@ -59,8 +59,8 @@ CREATE TABLE cart
 (
     cart_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
@@ -70,8 +70,8 @@ CREATE TABLE cart_item
     quantity INT NOT NULL,
     cart_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (cart_id) REFERENCES cart (cart_id),
     FOREIGN KEY (item_id) REFERENCES items (item_id)
 );
@@ -81,8 +81,8 @@ CREATE TABLE orders
     order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_status varchar(20) NOT NULL ,
     user_id BIGINT NOT NULL ,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
@@ -93,8 +93,8 @@ CREATE TABLE order_item
     quantity INT NOT NULL,
     order_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (order_id) REFERENCES orders (order_id),
     FOREIGN KEY (item_id) REFERENCES items (item_id)
 );
@@ -116,8 +116,8 @@ CREATE TABLE review
     user_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
     order_item_id BIGINT NOT NULL,
-    create_date timestamp(6),
-    modify_date timestamp(6),
+    create_date timestamp(6) default current_timestamp(6),
+    modify_date timestamp(6) default current_timestamp(6),
     FOREIGN KEY (user_id) REFERENCES users (user_id),
     FOREIGN KEY (item_id) REFERENCES items (item_id),
     FOREIGN KEY (order_item_id) REFERENCES order_item (order_item_id)
