@@ -2,6 +2,7 @@ package hgk.ecommerce.domain.shop.service;
 
 import hgk.ecommerce.domain.common.exceptions.AuthorizationException;
 import hgk.ecommerce.domain.common.exceptions.DuplicatedException;
+import hgk.ecommerce.domain.common.exceptions.NoResourceException;
 import hgk.ecommerce.domain.owner.Owner;
 import hgk.ecommerce.domain.shop.Shop;
 import hgk.ecommerce.domain.shop.dto.request.ShopSaveDto;
@@ -38,6 +39,13 @@ public class ShopService {
         Shop shop = Shop.createShop(shopSaveDto, owner);
 
         shopRepository.save(shop);
+    }
+
+    @Transactional(readOnly = true)
+    public Shop getShopEntity(Long shopId) {
+        return shopRepository.findById(shopId).orElseThrow(() -> {
+            throw new NoResourceException("가게를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+        });
     }
 
     //region PRIVATE METHOD
