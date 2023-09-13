@@ -34,6 +34,12 @@ public class CartService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<CartItem> getCartItemsEntityFetchItemByCart(User user) {
+        Cart cart = getCartByUser(user);
+        return getCartItemsFetchItemByCart(cart);
+    }
+
     @Transactional
     public void addCartItem(User user, CartItemSaveDto cartItemSaveDto) {
         Cart cart = getCartByUser(user);
