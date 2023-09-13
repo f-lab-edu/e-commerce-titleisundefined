@@ -18,12 +18,8 @@ public final class SessionUtils {
     }
 
 
-    public static void setUserSession(HttpSession session, Long value) {
-        session.setAttribute(SessionRole.USER.getContent(), value);
-    }
-
-    public static void setOwnerSession(HttpSession session, Long value) {
-        session.setAttribute(SessionRole.OWNER.getContent(), value);
+    public static void setSession(HttpSession session, Long value, SessionRole role) {
+        session.setAttribute(role.getContent(), value);
     }
 
     public static Long getSession(HttpSession session, SessionRole role) {

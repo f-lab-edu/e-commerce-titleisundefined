@@ -1,5 +1,6 @@
 package hgk.ecommerce.domain.user;
 
+import hgk.ecommerce.domain.common.entity.BaseTimeEntity;
 import hgk.ecommerce.domain.user.dto.enums.Status;
 import hgk.ecommerce.domain.user.dto.request.UserSignUpDto;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(of = "id")
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

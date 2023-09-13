@@ -2,36 +2,36 @@ package hgk.ecommerce.domain.user.service;
 
 import hgk.ecommerce.domain.common.exceptions.AuthorizationException;
 import hgk.ecommerce.domain.common.exceptions.DuplicatedException;
+import hgk.ecommerce.domain.common.service.SessionService;
 import hgk.ecommerce.domain.user.User;
 import hgk.ecommerce.domain.user.dto.enums.Status;
 import hgk.ecommerce.domain.user.dto.request.UserLoginDto;
 import hgk.ecommerce.domain.user.dto.request.UserSignUpDto;
 import hgk.ecommerce.domain.user.repository.UserRepository;
-import hgk.ecommerce.global.utils.SessionUtils;
-import jakarta.servlet.http.HttpSession;
+import hgk.ecommerce.global.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
-import static hgk.ecommerce.global.utils.SessionUtils.*;
+import static hgk.ecommerce.global.utils.PasswordUtils.*;
+import static hgk.ecommerce.global.utils.SessionUtils.SessionRole.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
-    private final HttpSession httpSession;
+    private final SessionService sessionService;
 
     @Override
     @Transactional(readOnly = true)
     public void login(UserLoginDto userLoginDto) {
         User user = getUserByLoginId(userLoginDto);
-        checkPassword(userLoginDto, user);
+        checkPassword(userLoginDto.getPassword(), user.getPassword());
         checkStatus(user.getStatus());
 
-        setUserSession(httpSession, user.getId());
+        sessionService.setSession(user.getId(), USER);
     }
 
     @Override
@@ -48,11 +48,12 @@ public class UserServiceImpl implements UserService{
     public void signOut(User user) {
         User currentUser = getCurrentUserById(user.getId());
         currentUser.deleteUser();
+        sessionService.logout();
     }
 
     @Override
     public void logout(User user) {
-        httpSession.invalidate();
+        sessionService.logout();
     }
 
     //region PRIVATE METHOD
@@ -82,14 +83,6 @@ public class UserServiceImpl implements UserService{
     private void checkStatus(Status status) {
         switch (status) {
             case DELETE -> throw new AuthorizationException("탈퇴한 회원 입니다.", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    private void checkPassword(UserLoginDto userLoginDto, User user) {
-        boolean isEqual = user.getPassword().equals(userLoginDto.getPassword());
-
-        if(!isEqual) {
-            throw new AuthorizationException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
         }
     }
 
