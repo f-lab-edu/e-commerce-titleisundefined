@@ -4,8 +4,8 @@ import hgk.ecommerce.domain.common.entity.BaseTimeEntity;
 import hgk.ecommerce.domain.common.exceptions.NoResourceException;
 import hgk.ecommerce.domain.item.dto.request.ItemEditDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSaveDto;
-import hgk.ecommerce.domain.item.enums.Category;
-import hgk.ecommerce.domain.item.enums.ItemStatus;
+import hgk.ecommerce.domain.item.dto.enums.Category;
+import hgk.ecommerce.domain.item.dto.enums.ItemStatus;
 import hgk.ecommerce.domain.shop.Shop;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import static hgk.ecommerce.domain.item.enums.ItemStatus.ACTIVE;
+import static hgk.ecommerce.domain.item.dto.enums.ItemStatus.ACTIVE;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

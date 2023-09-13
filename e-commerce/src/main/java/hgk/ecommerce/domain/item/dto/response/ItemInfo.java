@@ -3,11 +3,13 @@ package hgk.ecommerce.domain.item.dto.response;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import hgk.ecommerce.domain.item.Item;
-import hgk.ecommerce.domain.item.enums.Category;
-import hgk.ecommerce.domain.item.enums.ItemStatus;
+import hgk.ecommerce.domain.item.dto.enums.Category;
+import hgk.ecommerce.domain.item.dto.enums.ItemStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Getter
 @NoArgsConstructor
@@ -21,8 +23,9 @@ public class ItemInfo {
     private Long itemId;
     private Integer stock;
     private ItemStatus status;
+    private BigDecimal score;
 
-    public ItemInfo(Item item) {
+    public ItemInfo(Item item, BigDecimal score) {
         name = item.getName();
         price = item.getPrice();
         category = item.getCategory();
@@ -30,5 +33,6 @@ public class ItemInfo {
         itemId = item.getId();
         stock = item.getStock();
         status = item.getStatus();
+        this.score = score;
     }
 }

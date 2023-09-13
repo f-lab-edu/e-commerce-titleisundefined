@@ -86,6 +86,13 @@ public class OrderService {
         cancelOrderFromOrderItems(orderItems);
     }
 
+    @Transactional(readOnly = true)
+    public OrderItem getOrderItemById(Long orderItemId) {
+        return orderItemRepository.findById(orderItemId).orElseThrow(() -> {
+            throw new NoResourceException("주문 아이템을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+        });
+    }
+
     //region PRIVATE METHOD
 
     private void checkOrderAuth(User user, Order order) {

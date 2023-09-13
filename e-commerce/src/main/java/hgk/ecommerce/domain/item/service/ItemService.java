@@ -1,6 +1,5 @@
 package hgk.ecommerce.domain.item.service;
 
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hgk.ecommerce.domain.common.exceptions.AuthenticationException;
@@ -11,9 +10,10 @@ import hgk.ecommerce.domain.item.dto.request.ItemEditDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSaveDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSearch;
 import hgk.ecommerce.domain.item.dto.response.ItemInfo;
-import hgk.ecommerce.domain.item.enums.Category;
+import hgk.ecommerce.domain.item.dto.enums.Category;
 import hgk.ecommerce.domain.item.repository.ItemRepository;
 import hgk.ecommerce.domain.owner.Owner;
+import hgk.ecommerce.domain.review.service.ReviewService;
 import hgk.ecommerce.domain.shop.Shop;
 import hgk.ecommerce.domain.shop.service.ShopService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +31,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ShopService shopService;
     private final JPAQueryFactory jpaQueryFactory;
+    private final ReviewService reviewService;
 
     @Transactional(readOnly = true)
     public List<ItemInfo> getItemsByShop(Owner owner, Long shopId, Integer page, Integer count) {
@@ -43,7 +43,7 @@ public class ItemService {
         Page<Item> items = itemRepository.findItemsByShopId(shop.getId(), paging);
 
         return items.stream()
-                .map(ItemInfo::new)
+                .map(item -> new ItemInfo(item, reviewService.getAverageScore(item.getId())))
                 .toList();
     }
 
@@ -51,7 +51,9 @@ public class ItemService {
     public List<ItemInfo> searchItems(ItemSearch itemSearch, Integer page, Integer count) {
         List<Item> items = findItems(itemSearch, page, count);
 
-        return items.stream().map(ItemInfo::new).toList();
+        return items.stream()
+                .map(item -> new ItemInfo(item, reviewService.getAverageScore(item.getId())))
+                .toList();
     }
 
     @Transactional(readOnly = true)
