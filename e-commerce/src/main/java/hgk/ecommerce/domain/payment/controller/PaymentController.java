@@ -1,0 +1,35 @@
+package hgk.ecommerce.domain.payment.controller;
+
+import hgk.ecommerce.domain.common.annotation.AuthCheck;
+import hgk.ecommerce.domain.payment.service.PaymentService;
+import hgk.ecommerce.domain.user.User;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequestMapping("/payment")
+@RestController
+@RequiredArgsConstructor
+public class PaymentController {
+    private final PaymentService paymentService;
+
+    @PostMapping("/charge")
+    public void chargePoint(@AuthCheck User user, @Valid @RequestBody ChargeRequestDto chargeRequestDto) {
+        paymentService.increasePoint(user, chargeRequestDto.getPoint());
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    static class ChargeRequestDto {
+        @NotNull(message = "포인트를 입력해주세요.")
+        private Integer point;
+    }
+}
