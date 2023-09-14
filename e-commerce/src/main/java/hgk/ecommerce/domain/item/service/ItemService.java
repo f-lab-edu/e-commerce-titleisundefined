@@ -13,6 +13,7 @@ import hgk.ecommerce.domain.item.dto.response.ItemInfo;
 import hgk.ecommerce.domain.item.dto.enums.Category;
 import hgk.ecommerce.domain.item.repository.ItemRepository;
 import hgk.ecommerce.domain.owner.Owner;
+import hgk.ecommerce.domain.review.repository.ReviewRepository;
 import hgk.ecommerce.domain.review.service.ReviewService;
 import hgk.ecommerce.domain.shop.Shop;
 import hgk.ecommerce.domain.shop.service.ShopService;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -31,7 +33,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ShopService shopService;
     private final JPAQueryFactory jpaQueryFactory;
-    private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
     public List<ItemInfo> getItemsByShop(Owner owner, Long shopId, Integer page, Integer count) {
@@ -43,7 +45,7 @@ public class ItemService {
         Page<Item> items = itemRepository.findItemsByShopId(shop.getId(), paging);
 
         return items.stream()
-                .map(item -> new ItemInfo(item, reviewService.getAverageScore(item.getId())))
+                .map(item -> new ItemInfo(item, getAverageScoreByItemId(item)))
                 .toList();
     }
 
@@ -52,7 +54,7 @@ public class ItemService {
         List<Item> items = findItems(itemSearch, page, count);
 
         return items.stream()
-                .map(item -> new ItemInfo(item, reviewService.getAverageScore(item.getId())))
+                .map(item -> new ItemInfo(item, getAverageScoreByItemId(item)))
                 .toList();
     }
 
@@ -100,6 +102,7 @@ public class ItemService {
     }
 
     //region PRIVATE METHOD
+
     private Item getItemFetchShop(ItemEditDto itemEditDto) {
         return itemRepository.findItemFetchShop(itemEditDto.getItemId()).orElseThrow(() -> {
             throw new NoResourceException("상품이 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
@@ -124,6 +127,10 @@ public class ItemService {
 
     private BooleanExpression categoryCond(Category category) {
         return category != null ? QItem.item.category.eq(category) : null;
+    }
+
+    private BigDecimal getAverageScoreByItemId(Item item) {
+        return reviewRepository.getAverageScoreByItemId(item.getId());
     }
 
     private BooleanExpression titleCond(String title) {

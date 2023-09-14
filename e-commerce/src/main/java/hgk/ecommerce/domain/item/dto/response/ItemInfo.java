@@ -35,4 +35,14 @@ public class ItemInfo {
         status = item.getStatus();
         this.score = score;
     }
+
+    public ItemInfo(Item item) {
+        name = item.getName();
+        price = item.getPrice();
+        category = item.getCategory();
+        description = item.getDescription();
+        itemId = item.getId();
+        stock = item.getStock();
+        status = item.getStatus();
+    }
 }

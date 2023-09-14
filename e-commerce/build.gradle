@@ -31,6 +31,11 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    //Amazon Api
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.238'
+
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
