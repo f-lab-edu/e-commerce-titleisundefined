@@ -32,7 +32,9 @@ dependencies {
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
     //mysql
     implementation 'com.mysql:mysql-connector-j:8.0.33'
-
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.session:spring-session-data-redis'
     //Amazon Api
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.238'
 
