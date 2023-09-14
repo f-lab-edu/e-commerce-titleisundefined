@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static hgk.ecommerce.domain.order.dto.enums.OrderStatus.*;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -75,7 +77,7 @@ public class OrderService {
 
         checkOrderAuth(user, order);
 
-        if(order.getOrderStatus().equals(OrderStatus.CANCEL)) {
+        if(order.getOrderStatus().equals(CANCEL)) {
             throw new InvalidRequest("이미 취소된 주문입니다.", HttpStatus.BAD_REQUEST);
         }
 
@@ -84,6 +86,7 @@ public class OrderService {
 
         paymentService.increasePoint(user, totalPrice);
         cancelOrderFromOrderItems(orderItems);
+        order.changeStatus(CANCEL);
     }
 
     @Transactional(readOnly = true)

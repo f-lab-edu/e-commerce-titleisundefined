@@ -7,6 +7,7 @@ import hgk.ecommerce.domain.item.dto.request.ItemSaveDto;
 import hgk.ecommerce.domain.item.dto.enums.Category;
 import hgk.ecommerce.domain.item.dto.enums.ItemStatus;
 import hgk.ecommerce.domain.shop.Shop;
+import hgk.ecommerce.global.storage.ImageFile;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -29,7 +30,7 @@ public class Item extends BaseTimeEntity {
     private Long id;
 
     @NotNull
-    @Column(length = 50)
+    @Column(length = 100)
     private String name;
 
     @NotNull
@@ -53,7 +54,11 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop;
 
-    public static Item createItem(ItemSaveDto itemSave, Shop shop) {
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_file_id", nullable = false)
+    private ImageFile imageFile;
+
+    public static Item createItem(ItemSaveDto itemSave, Shop shop, ImageFile imageFile) {
         Item item = new Item();
         item.name = itemSave.getItemName();
         item.stock = itemSave.getStock();
@@ -62,6 +67,7 @@ public class Item extends BaseTimeEntity {
         item.category = itemSave.getCategory();
         item.description = itemSave.getDescription();
         item.shop = shop;
+        item.imageFile = imageFile;
 
         return item;
     }

@@ -19,6 +19,7 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "payment_id")
     private Long id;
 
+    @Column(name = "point")
     private Integer point;
 
     @OneToOne(fetch = FetchType.LAZY)

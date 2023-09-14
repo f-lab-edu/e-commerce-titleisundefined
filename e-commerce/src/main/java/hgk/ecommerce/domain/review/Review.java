@@ -43,7 +43,7 @@ public class Review extends BaseTimeEntity {
     private OrderItem orderItem;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "review_status")
+    @Column(name = "review_status", length = 30)
     ReviewStatus status;
 
     public static Review createReview(User user, Item item, OrderItem orderItem, ReviewSaveDto reviewSaveDto) {

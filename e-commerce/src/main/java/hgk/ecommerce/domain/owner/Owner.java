@@ -25,7 +25,7 @@ public class Owner extends BaseTimeEntity {
     private String loginId;
 
     @NotNull
-    @Column(length = 50)
+    @Column(length = 100)
     private String password;
 
     public static Owner createOwner(OwnerSignUpDto ownerSign) {
