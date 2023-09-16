@@ -49,12 +49,12 @@ public class NaverStorageService implements StorageService{
     }
 
     @Override
-    public void upload(MultipartFile file, IStorage iStorage, Bucket bucket) {
+    public void uploadAsync(MultipartFile file, IStorage iStorage, Bucket bucket) {
         uploadFile(file, iStorage, bucket);
     }
 
     @Override
-    public void delete(IStorage iStorage, Bucket bucket) {
+    public void deleteAsync(IStorage iStorage, Bucket bucket) {
 
     }
 

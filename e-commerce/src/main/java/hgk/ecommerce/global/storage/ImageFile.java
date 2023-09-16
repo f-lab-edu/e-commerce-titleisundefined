@@ -5,12 +5,14 @@ import hgk.ecommerce.global.storage.dto.IStorage;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "image_file")
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = true)
+@Getter
 public class ImageFile extends BaseTimeEntity implements IStorage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +31,11 @@ public class ImageFile extends BaseTimeEntity implements IStorage {
         imageFile.originalName = originalName;
 
         return imageFile;
+    }
+
+    public void editImageFile(String originalName, String virtualName) {
+        this.originalName = originalName;
+        this.virtualName = virtualName;
     }
 
     @Override

@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = true)
 @Entity
 @Table(name = "order_item")
 public class OrderItem extends BaseTimeEntity {

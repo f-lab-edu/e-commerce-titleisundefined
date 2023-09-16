@@ -2,6 +2,7 @@ package hgk.ecommerce.global.storage.service;
 
 import hgk.ecommerce.global.storage.dto.IStorage;
 import lombok.Getter;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -17,6 +18,8 @@ public interface StorageService {
         }
     };
 
-    void upload(MultipartFile file, IStorage iStorage, Bucket bucket);
-    void delete(IStorage iStorage, Bucket bucket);
+    @Async
+    void uploadAsync(MultipartFile file, IStorage iStorage, Bucket bucket);
+    @Async
+    void deleteAsync(IStorage iStorage, Bucket bucket);
 }

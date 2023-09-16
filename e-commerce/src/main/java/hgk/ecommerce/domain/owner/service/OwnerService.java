@@ -29,7 +29,6 @@ public class OwnerService {
     @Transactional(readOnly = true)
     public void login(OwnerLoginDto ownerLoginDto) {
         Owner owner = getOwnerByLoginId(ownerLoginDto);
-        checkDuplicateId(owner.getLoginId());
         checkPassword(ownerLoginDto.getPassword(), owner.getPassword());
 
         sessionService.setSession(owner.getId(), OWNER);
@@ -38,6 +37,8 @@ public class OwnerService {
     @Transactional
     public void signUp(OwnerSignUpDto ownerSignUpDto) {
         Owner owner = Owner.createOwner(ownerSignUpDto);
+        checkDuplicateId(owner.getLoginId());
+
         ownerRepository.save(owner);
     }
 

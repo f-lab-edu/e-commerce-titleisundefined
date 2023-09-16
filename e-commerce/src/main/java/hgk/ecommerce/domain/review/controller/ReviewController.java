@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -52,4 +53,8 @@ public class ReviewController {
         reviewService.editReview(user, reviewId, reviewEditDto);
     }
 
+    @PostMapping("/test/{reviewId}")
+    public void cacheTest(@PathVariable Long reviewId) {
+        BigDecimal averageScore = reviewService.getAverageScore(reviewId);
+    }
 }

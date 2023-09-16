@@ -21,7 +21,7 @@ import static hgk.ecommerce.domain.item.dto.enums.ItemStatus.ACTIVE;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = true)
 @Table(name = "items")
 public class Item extends BaseTimeEntity {
     @Id

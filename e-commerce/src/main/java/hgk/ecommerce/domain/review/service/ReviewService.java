@@ -14,6 +14,7 @@ import hgk.ecommerce.domain.review.repository.ReviewRepository;
 import hgk.ecommerce.domain.user.User;
 import hgk.ecommerce.domain.user.dto.enums.Status;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -82,8 +83,10 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(unless = "#result == null",value = "score", key = "#itemId")
     public BigDecimal getAverageScore(Long itemId) {
-        return reviewRepository.getAverageScoreByItemId(itemId);
+        return new BigDecimal("4." + itemId.intValue());
+        //return reviewRepository.getAverageScoreByItemId(itemId);
     }
 
     //region PRIVATE METHOD

@@ -1,5 +1,6 @@
 package hgk.ecommerce.domain.item.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import hgk.ecommerce.domain.item.Item;
@@ -23,6 +24,9 @@ public class ItemInfo {
     private Long itemId;
     private Integer stock;
     private ItemStatus status;
+    private String imageLink;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private BigDecimal score;
 
     public ItemInfo(Item item, BigDecimal score) {
@@ -34,6 +38,7 @@ public class ItemInfo {
         stock = item.getStock();
         status = item.getStatus();
         this.score = score;
+        this.imageLink = item.getImageFile().getVirtualName();
     }
 
     public ItemInfo(Item item) {

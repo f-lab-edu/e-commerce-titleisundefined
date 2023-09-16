@@ -7,6 +7,7 @@ import hgk.ecommerce.domain.common.exceptions.NoResourceException;
 import hgk.ecommerce.domain.item.Item;
 import hgk.ecommerce.domain.item.QItem;
 import hgk.ecommerce.domain.item.dto.request.ItemEditDto;
+import hgk.ecommerce.domain.item.dto.request.ItemFileDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSaveDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSearch;
 import hgk.ecommerce.domain.item.dto.response.ItemInfo;
@@ -17,12 +18,16 @@ import hgk.ecommerce.domain.review.repository.ReviewRepository;
 import hgk.ecommerce.domain.review.service.ReviewService;
 import hgk.ecommerce.domain.shop.Shop;
 import hgk.ecommerce.domain.shop.service.ShopService;
+import hgk.ecommerce.global.storage.ImageFile;
+import hgk.ecommerce.global.storage.QImageFile;
+import hgk.ecommerce.global.storage.service.ImageFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,6 +39,7 @@ public class ItemService {
     private final ShopService shopService;
     private final JPAQueryFactory jpaQueryFactory;
     private final ReviewRepository reviewRepository;
+    private final ImageFileService imageFileService;
 
     @Transactional(readOnly = true)
     public List<ItemInfo> getItemsByShop(Owner owner, Long shopId, Integer page, Integer count) {
@@ -66,18 +72,21 @@ public class ItemService {
     }
 
     @Transactional
-    public void enrollItem(Owner owner, ItemSaveDto itemSaveDto) {
+    public Long enrollItem(Owner owner, ItemSaveDto itemSaveDto) {
         Shop shop = shopService.getShopEntity(itemSaveDto.getShopId());
         checkAuth(shop.getOwner().getId(), owner.getId());
 
-        Item item = Item.createItem(itemSaveDto, shop);
 
-        itemRepository.save(item);
+        ImageFile imageFile = imageFileService.saveImageFile(itemSaveDto.getFile());
+
+        Item item = Item.createItem(itemSaveDto, shop, imageFile);
+
+        return itemRepository.save(item).getId();
     }
 
     @Transactional
     public void editItem(Owner owner, ItemEditDto itemEditDto) {
-        Item item = getItemFetchShop(itemEditDto);
+        Item item = getItemFetchShop(itemEditDto.getItemId());
         checkAuth(item.getShop().getOwner().getId(), owner.getId());
 
         item.editItem(itemEditDto);
@@ -85,26 +94,37 @@ public class ItemService {
 
     @Transactional
     public void increaseStock(Long itemId, Integer quantity) {
-        Item item = itemRepository.findItemWithLock(itemId).orElseThrow(() -> {
-            throw new NoResourceException("아이템을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
-        });
+        Item item = getItemWithLock(itemId);
 
         item.increaseStock(quantity);
     }
 
     @Transactional
     public void decreaseStock(Long itemId, Integer quantity) {
-        Item item = itemRepository.findItemWithLock(itemId).orElseThrow(() -> {
-            throw new NoResourceException("아이템을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
-        });
+        Item item = getItemWithLock(itemId);
 
         item.decreaseStock(quantity);
     }
 
+    @Transactional
+    public void changeItemImage(Owner owner, ItemFileDto itemFileDto) {
+        Item item = getItemFetchShop(itemFileDto.getItemId());
+        checkAuth(owner.getId(), item.getShop().getOwner().getId());
+
+        imageFileService.putImageFile(item.getImageFile().getId(), itemFileDto.getFile());
+    }
+
+
     //region PRIVATE METHOD
 
-    private Item getItemFetchShop(ItemEditDto itemEditDto) {
-        return itemRepository.findItemFetchShop(itemEditDto.getItemId()).orElseThrow(() -> {
+    private Item getItemWithLock(Long itemId) {
+        return itemRepository.findItemWithLock(itemId).orElseThrow(() -> {
+            throw new NoResourceException("아이템을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+        });
+    }
+
+    private Item getItemFetchShop(Long itemId) {
+        return itemRepository.findItemFetchShop(itemId).orElseThrow(() -> {
             throw new NoResourceException("상품이 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
         });
     }
@@ -118,6 +138,8 @@ public class ItemService {
     private List<Item> findItems(ItemSearch itemSearch, Integer page, Integer count) {
         return jpaQueryFactory
                 .selectFrom(QItem.item)
+                .leftJoin(QItem.item.imageFile, QImageFile.imageFile)
+                .fetchJoin()
                 .where(categoryCond(itemSearch.getCategory()),
                         titleCond(itemSearch.getName()))
                 .offset(page - 1)

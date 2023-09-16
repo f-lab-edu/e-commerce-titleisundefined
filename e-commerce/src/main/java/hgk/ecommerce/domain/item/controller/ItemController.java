@@ -2,6 +2,7 @@ package hgk.ecommerce.domain.item.controller;
 
 import hgk.ecommerce.domain.common.annotation.AuthCheck;
 import hgk.ecommerce.domain.item.dto.request.ItemEditDto;
+import hgk.ecommerce.domain.item.dto.request.ItemFileDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSaveDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSearch;
 import hgk.ecommerce.domain.item.dto.response.ItemInfo;
@@ -10,6 +11,7 @@ import hgk.ecommerce.domain.owner.Owner;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -45,5 +47,11 @@ public class ItemController {
     public void editItem(@AuthCheck Owner owner,
                          @Valid @RequestBody ItemEditDto itemEdit) {
         itemService.editItem(owner, itemEdit);
+    }
+
+    @PutMapping
+    public void changeItemImage(@AuthCheck Owner owner,
+                                @Valid ItemFileDto itemFileDto) {
+        itemService.changeItemImage(owner, itemFileDto);
     }
 }

@@ -6,6 +6,7 @@ import hgk.ecommerce.domain.item.dto.enums.Category;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ItemSaveDto {
     @NotNull
     private Long shopId;
@@ -27,4 +29,6 @@ public class ItemSaveDto {
     private Category category;
     @NotEmpty(message = "상품 설명을 입력해주세요.")
     private String description;
+    @NotNull(message = "이미지를 등록해주세요.")
+    private MultipartFile file;
 }
