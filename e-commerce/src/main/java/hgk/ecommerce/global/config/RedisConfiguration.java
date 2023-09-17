@@ -23,24 +23,13 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-
+import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
 @EnableCaching
-@Profile("release")
-public class RedisConfiguration {
-    @Value("${spring.session.redis.host}")
-    private String redisSessionHost;
-
-    @Value("${spring.session.redis.port}")
-    private int redisSessionPort;
-
-    @Value("${spring.session.redis.password}")
-    private String redisSessionPassword;
-
+public class RedisConfiguration extends AbstractHttpSessionApplicationInitializer {
     @Value("${spring.cache.redis.host}")
     private String redisCacheHost;
 
@@ -49,29 +38,6 @@ public class RedisConfiguration {
 
     @Value("${spring.cache.redis.password}")
     private String redisCachePassword;
-
-    @Primary
-    @Bean(name = "redisSessionFactory")
-    public RedisConnectionFactory redisSessionConnectionFactory() {
-        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
-        redisConfig.setHostName(redisSessionHost);
-        redisConfig.setPort(redisSessionPort);
-        redisConfig.setPassword(redisSessionPassword);
-
-        return new LettuceConnectionFactory(redisConfig);
-    }
-
-    @Bean
-    public StringRedisTemplate sessionTemplate() {
-        StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
-        stringRedisTemplate.setConnectionFactory(redisSessionConnectionFactory());
-        stringRedisTemplate.setKeySerializer(new StringRedisSerializer());
-        stringRedisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(new ObjectMapper()));
-        stringRedisTemplate.setDefaultSerializer(new StringRedisSerializer());
-        stringRedisTemplate.afterPropertiesSet();
-
-        return stringRedisTemplate;
-    }
 
     @Bean
     public RedisConnectionFactory redisCacheConnectionFactory() {
@@ -84,9 +50,9 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(@Qualifier("redisCacheConnectionFactory") RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisCacheConnectionFactory());
+        redisTemplate.setConnectionFactory(connectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
@@ -100,15 +66,6 @@ public class RedisConfiguration {
                 .cacheDefaults(redisCacheConfiguration()).build();
         return redisCacheManager;
     }
-
-//    @Bean
-//    public RedissonClient redissonClient() {
-//        RedissonClient redisson = null;
-//        Config config = new Config();
-//        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + redisHost + ":" + redisPort);
-//        redisson = Redisson.create(config);
-//        return redisson;
-//    }
 
     private RedisCacheConfiguration redisCacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()

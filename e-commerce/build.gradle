@@ -36,7 +36,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.4'
-
+    implementation 'org.springframework.session:spring-session-core:3.0.1'
+    implementation 'org.redisson:redisson-spring-data-30:3.21.0'
+    implementation 'org.redisson:redisson:3.23.4'
     implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
     //Amazon Api
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.238'
