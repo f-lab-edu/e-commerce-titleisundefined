@@ -381,7 +381,6 @@ class ItemServiceTest {
     //endregion
 
     //region 아이템 동시성 재고
-
     @SpringBootTest
     @ActiveProfiles("test")
     static class 재고증가테스트 {
@@ -396,18 +395,17 @@ class ItemServiceTest {
 
 
         @Test
-        @Transactional
         void 재고_증가_동시성() throws InterruptedException {
             Owner ownerA = createOwner("test-loginid-increase", "test-password");
             Shop shop = createShop("test-shop-increase", ownerA);
 
             ItemSaveDto saveDto = ItemSaveDto.builder()
-                    .itemName("test-name")
+                    .itemName("mock-increase-item")
                     .shopId(shop.getId())
                     .stock(0)
                     .price(1000000)
                     .file(createMockFile("test.jpg"))
-                    .category(Category.ETC)
+                    .category(Category.TEST)
                     .description("test-description")
                     .build();
 
@@ -438,18 +436,17 @@ class ItemServiceTest {
         }
 
         @Test
-        @Transactional
         void 재고_감소_동시성() throws InterruptedException {
             Owner ownerA = createOwner("test-loginid-decrease", "test-password");
             Shop shop = createShop("test-shop-decrease", ownerA);
 
             ItemSaveDto saveDto = ItemSaveDto.builder()
-                    .itemName("test-name")
+                    .itemName("mock-decrease-item")
                     .shopId(shop.getId())
                     .stock(100)
                     .price(1000000)
                     .file(createMockFile("test.jpg"))
-                    .category(Category.ETC)
+                    .category(Category.TEST)
                     .description("test-description")
                     .build();
 
@@ -476,7 +473,6 @@ class ItemServiceTest {
 
             Item item = itemService.getItemEntity(itemId);
             assertThat(item.getStock()).isEqualTo(0);
-
         }
 
         private ItemSearch createSearchCond(String name, Category category) {
@@ -501,9 +497,6 @@ class ItemServiceTest {
             return shopRepository.save(shop);
         }
     }
-
-
-
     //endregion
 
     //region Stub Method
