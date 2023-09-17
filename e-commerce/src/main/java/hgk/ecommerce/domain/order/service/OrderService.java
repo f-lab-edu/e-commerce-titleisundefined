@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static hgk.ecommerce.domain.order.dto.enums.OrderStatus.*;
+import static org.springframework.data.domain.Sort.Direction.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderInfo> getOrderInfo(User user, Integer page, Integer count) {
-        PageRequest pageRequest = PageRequest.of(page - 1, count, Sort.Direction.DESC, "createDate");
+        PageRequest pageRequest = PageRequest.of(page - 1, count, DESC, "createDate");
         Page<Order> orders = orderRepository.findAll(pageRequest);
 
         return orders.stream().map(OrderInfo::new).toList();

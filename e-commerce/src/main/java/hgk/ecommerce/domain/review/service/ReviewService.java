@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static hgk.ecommerce.domain.review.dto.enums.ReviewStatus.*;
+import static org.springframework.data.domain.Sort.Direction.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public List<ReviewInfo> getItemReviews(Long itemId, Integer page, Integer count) {
-        PageRequest paging = PageRequest.of(page - 1, count, Sort.Direction.DESC, "createDate");
+        PageRequest paging = PageRequest.of(page - 1, count, DESC, "createDate");
         Page<Review> reviews = reviewRepository.findReviewsByItemIdAndStatusIs(itemId, ACTIVE, paging);
 
         return reviews.stream()
@@ -46,7 +47,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public List<ReviewInfo> getUserReviews(User user, Integer page, Integer count) {
-        PageRequest paging = PageRequest.of(page - 1, count, Sort.Direction.DESC, "createDate");
+        PageRequest paging = PageRequest.of(page - 1, count, DESC, "createDate");
         Page<Review> reviews = reviewRepository.findReviewsByUserIdAndStatusIs(user.getId(), ACTIVE, paging);
 
         return reviews.stream()
@@ -83,7 +84,8 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(unless = "#result == null",value = "score", key = "#itemId")
+    @Cacheable(value ="reviews", key = "#itemId",
+    unless = "#result == null")
     public BigDecimal getAverageScore(Long itemId) {
         return new BigDecimal("4." + itemId.intValue());
         //return reviewRepository.getAverageScoreByItemId(itemId);

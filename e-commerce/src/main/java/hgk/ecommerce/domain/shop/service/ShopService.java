@@ -11,11 +11,14 @@ import hgk.ecommerce.domain.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public List<ShopInfo> getShops(Owner owner, Integer page, Integer count) {
-        PageRequest paging = PageRequest.of(page - 1, count);
+        PageRequest paging = PageRequest.of(page - 1, count, ASC, "createDate");
 
         Page<Shop> shops = shopRepository.findShopsByOwnerId(owner.getId(), paging);
 

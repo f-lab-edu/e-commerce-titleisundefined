@@ -2,6 +2,7 @@ package hgk.ecommerce.domain.item.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import hgk.ecommerce.domain.common.annotation.RedisLock;
 import hgk.ecommerce.domain.common.exceptions.AuthenticationException;
 import hgk.ecommerce.domain.common.exceptions.NoResourceException;
 import hgk.ecommerce.domain.item.Item;
@@ -32,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
+
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -46,7 +49,7 @@ public class ItemService {
         Shop shop = shopService.getShopEntity(shopId);
         checkAuth(shop.getOwner().getId(), owner.getId());
 
-        PageRequest paging = PageRequest.of(page - 1, count);
+        PageRequest paging = PageRequest.of(page - 1, count, ASC, "createDate");
 
         Page<Item> items = itemRepository.findItemsByShopId(shop.getId(), paging);
 
@@ -92,14 +95,14 @@ public class ItemService {
         item.editItem(itemEditDto);
     }
 
-    @Transactional
+    @RedisLock(key = "#itemId")
     public void increaseStock(Long itemId, Integer quantity) {
         Item item = getItemWithLock(itemId);
 
         item.increaseStock(quantity);
     }
 
-    @Transactional
+    @RedisLock(key = "#itemId")
     public void decreaseStock(Long itemId, Integer quantity) {
         Item item = getItemWithLock(itemId);
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
-    @Query("select ci from CartItem ci join fetch ci.item where ci.cart.id = :cartId")
+    @Query("select ci from CartItem ci join fetch ci.item where ci.cart.id = :cartId order by ci.modifyDate")
     List<CartItem> findCartItemsFetchItemsByCart(@Param("cartId") Long cartId);
 
     void deleteCartItemsByCart(Cart cart);
