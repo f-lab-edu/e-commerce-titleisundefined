@@ -41,7 +41,7 @@ public class CartService {
     }
 
     @Transactional
-    public void addCartItem(User user, CartItemSaveDto cartItemSaveDto) {
+    public Long addCartItem(User user, CartItemSaveDto cartItemSaveDto) {
         Cart cart = getCartByUser(user);
 
         Item item = itemService.getItemEntity(cartItemSaveDto.getItemId());
@@ -49,13 +49,17 @@ public class CartService {
         List<CartItem> cartItems = getCartItemsFetchItemByCart(cart);
         Optional<CartItem> optionalCartItem = findCartItemByItem(cartItems, item);
 
+        CartItem cartItem = null;
+
         if (optionalCartItem.isPresent()) {
-            CartItem cartItem = optionalCartItem.get();
+            cartItem = optionalCartItem.get();
             cartItem.increaseQuantity(cartItemSaveDto.getCount());
         } else {
-            CartItem cartItem = CartItem.createCartItem(cart, item, cartItemSaveDto.getCount());
+            cartItem = CartItem.createCartItem(cart, item, cartItemSaveDto.getCount());
             cartItemRepository.save(cartItem);
         }
+
+        return cartItem.getId();
     }
 
     @Transactional
