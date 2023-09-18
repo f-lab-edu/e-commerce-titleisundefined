@@ -97,14 +97,14 @@ public class ItemService {
 
     @RedisLock(key = "#itemId")
     public void increaseStock(Long itemId, Integer quantity) {
-        Item item = getItemWithLock(itemId);
+        Item item = getItemEntity(itemId);
 
         item.increaseStock(quantity);
     }
 
     @RedisLock(key = "#itemId")
     public void decreaseStock(Long itemId, Integer quantity) {
-        Item item = getItemWithLock(itemId);
+        Item item = getItemEntity(itemId);
 
         item.decreaseStock(quantity);
     }
@@ -120,11 +120,11 @@ public class ItemService {
 
     //region PRIVATE METHOD
 
-    private Item getItemWithLock(Long itemId) {
-        return itemRepository.findItemWithLock(itemId).orElseThrow(() -> {
-            throw new NoResourceException("아이템을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
-        });
-    }
+//    private Item getItemWithLock(Long itemId) {
+//        return itemRepository.findItemWithLock(itemId).orElseThrow(() -> {
+//            throw new NoResourceException("아이템을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+//        });
+//    }
 
     private Item getItemFetchShop(Long itemId) {
         return itemRepository.findItemFetchShop(itemId).orElseThrow(() -> {

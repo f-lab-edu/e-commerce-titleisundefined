@@ -56,7 +56,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void enrollReview(User user, ReviewSaveDto reviewSaveDto, Long orderItemId) {
+    public Long enrollReview(User user, ReviewSaveDto reviewSaveDto, Long orderItemId) {
         OrderItem orderItem = orderService.getOrderItemById(orderItemId);
         Order order = orderItem.getOrder();
 
@@ -64,7 +64,8 @@ public class ReviewService {
         checkReviewHistory(orderItemId);
 
         Review review = Review.createReview(user, orderItem.getItem(), orderItem, reviewSaveDto);
-        reviewRepository.save(review);
+
+        return reviewRepository.save(review).getId();
     }
 
     @Transactional

@@ -27,7 +27,7 @@ public class Review extends BaseTimeEntity {
     @Column(nullable = false, length = 200)
     private String content;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 2, scale = 1)
     private BigDecimal score;
 
     @ManyToOne(fetch = FetchType.LAZY)
