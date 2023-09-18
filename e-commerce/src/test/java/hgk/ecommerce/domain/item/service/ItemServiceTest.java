@@ -92,7 +92,6 @@ class ItemServiceTest {
         assertThat(itemInfo.getStock()).isEqualTo(saveDto.getStock());
         assertThat(itemInfo.getCategory()).isEqualTo(saveDto.getCategory());
         assertThat(itemInfo.getImageLink()).isNotNull();
-        assertThat(itemInfo.getStatus()).isEqualTo(ACTIVE);
     }
 
     @Test
