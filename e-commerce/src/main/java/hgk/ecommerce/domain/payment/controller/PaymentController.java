@@ -3,6 +3,9 @@ package hgk.ecommerce.domain.payment.controller;
 import hgk.ecommerce.domain.common.annotation.AuthCheck;
 import hgk.ecommerce.domain.payment.service.PaymentService;
 import hgk.ecommerce.domain.user.User;
+import hgk.ecommerce.global.swagger.SwaggerConst;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static hgk.ecommerce.global.swagger.SwaggerConst.*;
+
 @RequestMapping("/payment")
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +26,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/charge")
+    @Operation(summary = "포인트 충전", tags = USER)
     public void chargePoint(@AuthCheck User user, @Valid @RequestBody ChargeRequestDto chargeRequestDto) {
         paymentService.increasePoint(user, chargeRequestDto.getPoint());
     }
