@@ -32,7 +32,7 @@ public class OrderItem extends BaseTimeEntity {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 

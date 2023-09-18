@@ -17,13 +17,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ItemInfo {
+
     private String name;
     private Integer price;
     private Category category;
     private String description;
     private Long itemId;
     private Integer stock;
-    private ItemStatus status;
     private String imageLink;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,7 +36,6 @@ public class ItemInfo {
         description = item.getDescription();
         itemId = item.getId();
         stock = item.getStock();
-        status = item.getStatus();
         this.score = score;
         this.imageLink = item.getImageFile().getVirtualName();
     }
@@ -48,6 +47,6 @@ public class ItemInfo {
         description = item.getDescription();
         itemId = item.getId();
         stock = item.getStock();
-        status = item.getStatus();
+        imageLink = item.getImageFile().getVirtualName();
     }
 }

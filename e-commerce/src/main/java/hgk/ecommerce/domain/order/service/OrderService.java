@@ -5,21 +5,22 @@ import hgk.ecommerce.domain.cart.service.CartService;
 import hgk.ecommerce.domain.common.exceptions.AuthenticationException;
 import hgk.ecommerce.domain.common.exceptions.InvalidRequest;
 import hgk.ecommerce.domain.common.exceptions.NoResourceException;
-import hgk.ecommerce.domain.item.Item;
+import hgk.ecommerce.domain.item.repository.ItemRepository;
 import hgk.ecommerce.domain.item.service.ItemService;
 import hgk.ecommerce.domain.order.Order;
 import hgk.ecommerce.domain.order.OrderItem;
-import hgk.ecommerce.domain.order.dto.enums.OrderStatus;
 import hgk.ecommerce.domain.order.dto.response.OrderDetail;
 import hgk.ecommerce.domain.order.dto.response.OrderInfo;
 import hgk.ecommerce.domain.order.repository.OrderItemRepository;
 import hgk.ecommerce.domain.order.repository.OrderRepository;
 import hgk.ecommerce.domain.payment.service.PaymentService;
 import hgk.ecommerce.domain.user.User;
+import hgk.ecommerce.global.storage.ImageFile;
+import hgk.ecommerce.global.storage.repository.ImageFileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,17 +48,18 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderInfo getOrderDetail(User user, Long orderId) {
+    public OrderDetail getOrderDetail(User user, Long orderId) {
         Order order = getOrderById(orderId);
 
         checkOrderAuth(user, order);
-        List<OrderItem> orderItems = orderItemRepository.findOrderItemsFetchItemsByOrderId(orderId);
+        List<OrderItem> orderItems = orderItemRepository.findOrderItemsFetchItemByOrderId(orderId);
 
         return new OrderDetail(order, orderItems);
     }
 
+
     @Transactional
-    public void order(User user) {
+    public Long order(User user) {
         List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user);
 
         if(cartItems.isEmpty()) {
@@ -67,9 +69,14 @@ public class OrderService {
         int totalPrice = cartItemsTotalPrice(cartItems);
 
         paymentService.decreasePoint(user, totalPrice);
-        proceedOrderFromCartItems(user, cartItems);
+
+        Order order = Order.createOrder(user);
+        orderRepository.save(order);
+        proceedOrderFromCartItems(order, cartItems);
 
         cartService.clearCart(user);
+
+        return order.getId();
     }
 
     @Transactional
@@ -82,7 +89,7 @@ public class OrderService {
             throw new InvalidRequest("이미 취소된 주문입니다.", HttpStatus.BAD_REQUEST);
         }
 
-        List<OrderItem> orderItems = orderItemRepository.findOrderItemsFetchItemsByOrderId(order.getId());
+        List<OrderItem> orderItems = orderItemRepository.findOrderItemsFetchItemByOrderId(order.getId());
         int totalPrice = orderItemsTotalPrice(orderItems);
 
         paymentService.increasePoint(user, totalPrice);
@@ -121,9 +128,7 @@ public class OrderService {
         return orderItems.stream().mapToInt(oi -> oi.getTotalPrice()).sum();
     }
 
-    private void proceedOrderFromCartItems(User user, List<CartItem> cartItems) {
-        Order order = Order.createOrder(user);
-        orderRepository.save(order);
+    private void proceedOrderFromCartItems(Order order, List<CartItem> cartItems) {
         orderCartItems(cartItems, order);
     }
 

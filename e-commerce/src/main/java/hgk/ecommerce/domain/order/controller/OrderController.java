@@ -1,6 +1,7 @@
 package hgk.ecommerce.domain.order.controller;
 
 import hgk.ecommerce.domain.common.annotation.AuthCheck;
+import hgk.ecommerce.domain.order.dto.response.OrderDetail;
 import hgk.ecommerce.domain.order.dto.response.OrderInfo;
 import hgk.ecommerce.domain.order.service.OrderService;
 import hgk.ecommerce.domain.user.User;
@@ -23,7 +24,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public OrderInfo getOrderDetails(@AuthCheck User user, @PathVariable Long orderId) {
+    public OrderDetail getOrderDetails(@AuthCheck User user, @PathVariable Long orderId) {
         return orderService.getOrderDetail(user, orderId);
     }
 
