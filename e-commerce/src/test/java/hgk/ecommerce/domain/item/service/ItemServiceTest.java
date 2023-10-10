@@ -76,10 +76,10 @@ class ItemServiceTest {
                 .description("test-description")
                 .build();
 
-        itemService.enrollItem(ownerA, saveDto);
+        itemService.enrollItem(ownerA.getId(), saveDto);
         flushAndClearPersistence();
 
-        List<ItemInfo> itemInfos = itemService.getItemsByShop(ownerA, shop.getId(), 1, 5);
+        List<ItemInfo> itemInfos = itemService.getItemsByShop(ownerA.getId(), shop.getId(), 1, 5);
 
         assertThat(itemInfos.size()).isEqualTo(1);
 
@@ -106,7 +106,7 @@ class ItemServiceTest {
                 .description("test-description")
                 .build();
 
-        assertThatThrownBy(() -> itemService.enrollItem(ownerB, saveDto))
+        assertThatThrownBy(() -> itemService.enrollItem(ownerB.getId(), saveDto))
                 .isInstanceOf(AuthenticationException.class);
     }
 
@@ -128,7 +128,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
         flushAndClearPersistence();
@@ -155,7 +155,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
         for (int i = 0; i < loopCount; i++) {
@@ -169,7 +169,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
         for (int i = 0; i < loopCount; i++) {
@@ -183,7 +183,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
         for (int i = 0; i < loopCount; i++) {
@@ -197,7 +197,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
         flushAndClearPersistence();
@@ -223,7 +223,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
         assertThat(itemService.searchItems(createSearchCond("ETC", Category.ETC), 1, loopCount).size()).isEqualTo(loopCount);
@@ -245,12 +245,12 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
-        assertThat(itemService.getItemsByShop(ownerA, shop.getId(), 1, loopCount).size()).isEqualTo(loopCount);
-        assertThat(itemService.getItemsByShop(ownerA, shop.getId(), 1, loopCount + 1).size()).isEqualTo(loopCount);
-        assertThat(itemService.getItemsByShop(ownerA, shop.getId(), 1, loopCount - 1).size()).isEqualTo(loopCount - 1);
+        assertThat(itemService.getItemsByShop(ownerA.getId(), shop.getId(), 1, loopCount).size()).isEqualTo(loopCount);
+        assertThat(itemService.getItemsByShop(ownerA.getId(), shop.getId(), 1, loopCount + 1).size()).isEqualTo(loopCount);
+        assertThat(itemService.getItemsByShop(ownerA.getId(), shop.getId(), 1, loopCount - 1).size()).isEqualTo(loopCount - 1);
     }
 
     @Test
@@ -267,10 +267,10 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            itemService.enrollItem(ownerA, saveDto);
+            itemService.enrollItem(ownerA.getId(), saveDto);
         }
 
-        assertThatThrownBy(() -> itemService.getItemsByShop(ownerB, shop.getId(), 1, loopCount))
+        assertThatThrownBy(() -> itemService.getItemsByShop(ownerB.getId(), shop.getId(), 1, loopCount))
                 .isInstanceOf(AuthenticationException.class);
     }
 
@@ -290,7 +290,7 @@ class ItemServiceTest {
                 .description("test-description")
                 .build();
 
-        Long itemId = itemService.enrollItem(ownerA, saveDto);
+        Long itemId = itemService.enrollItem(ownerA.getId(), saveDto);
         flushAndClearPersistence();
 
         ItemEditDto itemEditDto = ItemEditDto.builder()
@@ -303,7 +303,7 @@ class ItemServiceTest {
                 .description("change-description")
                 .build();
 
-        itemService.editItem(ownerA, itemEditDto);
+        itemService.editItem(ownerA.getId(), itemEditDto);
         flushAndClearPersistence();
 
         Item item = itemRepository.findById(itemId).get();
@@ -328,7 +328,7 @@ class ItemServiceTest {
                 .description("test-description")
                 .build();
 
-        Long itemId = itemService.enrollItem(ownerA, saveDto);
+        Long itemId = itemService.enrollItem(ownerA.getId(), saveDto);
         flushAndClearPersistence();
 
         ItemEditDto itemEditDto = ItemEditDto.builder()
@@ -341,7 +341,7 @@ class ItemServiceTest {
                 .description("change-description")
                 .build();
 
-        assertThatThrownBy(() -> itemService.editItem(ownerB, itemEditDto))
+        assertThatThrownBy(() -> itemService.editItem(ownerB.getId(), itemEditDto))
                 .isInstanceOf(AuthenticationException.class);
     }
 
@@ -357,7 +357,7 @@ class ItemServiceTest {
                 .description("test-description")
                 .build();
 
-        Long itemId = itemService.enrollItem(ownerA, saveDto);
+        Long itemId = itemService.enrollItem(ownerA.getId(), saveDto);
         flushAndClearPersistence();
 
         ItemFileDto itemFileDto = ItemFileDto.builder()
@@ -367,7 +367,7 @@ class ItemServiceTest {
         Item item = itemService.getItemEntity(itemId);
         String virtualName = item.getImageFile().getVirtualName();
 
-        itemService.changeItemImage(ownerA, itemFileDto);
+        itemService.changeItemImage(ownerA.getId(), itemFileDto);
 
         flushAndClearPersistence();
 
@@ -408,10 +408,9 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            Long itemId = itemService.enrollItem(ownerA, saveDto);
+            Long itemId = itemService.enrollItem(ownerA.getId(), saveDto);
 
             int threadCount = 100;
-
             ExecutorService executorService = Executors.newFixedThreadPool(32);
             CountDownLatch latch = new CountDownLatch(threadCount);
 
@@ -428,10 +427,8 @@ class ItemServiceTest {
 
             latch.await();
 
-
             Item item = itemService.getItemEntity(itemId);
             assertThat(item.getStock()).isEqualTo(threadCount);
-
         }
 
         @Test
@@ -449,7 +446,7 @@ class ItemServiceTest {
                     .description("test-description")
                     .build();
 
-            Long itemId = itemService.enrollItem(ownerA, saveDto);
+            Long itemId = itemService.enrollItem(ownerA.getId(), saveDto);
 
             int threadCount = 100;
 

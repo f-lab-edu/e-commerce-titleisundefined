@@ -4,6 +4,7 @@ import hgk.ecommerce.domain.common.exceptions.AuthorizationException;
 import hgk.ecommerce.domain.common.exceptions.DuplicatedException;
 import hgk.ecommerce.domain.common.exceptions.NoResourceException;
 import hgk.ecommerce.domain.owner.Owner;
+import hgk.ecommerce.domain.owner.service.OwnerService;
 import hgk.ecommerce.domain.shop.Shop;
 import hgk.ecommerce.domain.shop.dto.request.ShopSaveDto;
 import hgk.ecommerce.domain.shop.dto.response.ShopInfo;
@@ -24,9 +25,10 @@ import static org.springframework.data.domain.Sort.Direction.*;
 @RequiredArgsConstructor
 public class ShopService {
     private final ShopRepository shopRepository;
-
+    private final OwnerService ownerService;
     @Transactional(readOnly = true)
-    public List<ShopInfo> getShops(Owner owner, Integer page, Integer count) {
+    public List<ShopInfo> getShops(Long ownerId, Integer page, Integer count) {
+        Owner owner = ownerService.getCurrentOwnerById(ownerId);
         PageRequest paging = PageRequest.of(page - 1, count, ASC, "createDate");
 
         Page<Shop> shops = shopRepository.findShopsByOwnerId(owner.getId(), paging);
@@ -36,7 +38,8 @@ public class ShopService {
     }
 
     @Transactional
-    public void enrollShop(Owner owner, ShopSaveDto shopSaveDto) {
+    public void enrollShop(Long ownerId, ShopSaveDto shopSaveDto) {
+        Owner owner = ownerService.getCurrentOwnerById(ownerId);
         checkDuplicateName(shopSaveDto);
 
         Shop shop = Shop.createShop(shopSaveDto, owner);

@@ -35,31 +35,31 @@ public class ReviewController {
 
     @GetMapping
     @Operation(summary = "내 리뷰 조회", tags = USER)
-    public List<ReviewInfo> getUserReviews(@AuthCheck User user,
+    public List<ReviewInfo> getUserReviews(@AuthCheck(role = AuthCheck.Role.USER) Long userId,
                                            @RequestParam(defaultValue = "1") Integer page,
                                            @RequestParam(defaultValue = "5") Integer count) {
-        return reviewService.getUserReviews(user, page, count);
+        return reviewService.getUserReviews(userId, page, count);
     }
 
     @PostMapping("/{orderItemId}")
     @Operation(summary = "리뷰 등록", tags = USER)
-    public void enrollReview(@AuthCheck User user,
+    public void enrollReview(@AuthCheck(role = AuthCheck.Role.USER) Long userId,
                              @Valid @RequestBody ReviewSaveDto reviewSaveDto,
                              @PathVariable Long orderItemId) {
-        reviewService.enrollReview(user, reviewSaveDto, orderItemId);
+        reviewService.enrollReview(userId, reviewSaveDto, orderItemId);
     }
 
     @DeleteMapping("/{reviewId}")
     @Operation(summary = "리뷰 삭제", tags = USER)
-    public void removeReview(@AuthCheck User user, @PathVariable Long reviewId) {
-        reviewService.deleteReview(user, reviewId);
+    public void removeReview(@AuthCheck(role = AuthCheck.Role.USER) Long userId, @PathVariable Long reviewId) {
+        reviewService.deleteReview(userId, reviewId);
     }
 
     @PatchMapping("/{reviewId}")
     @Operation(summary = "리뷰 수정", tags = USER)
-    public void editReview(@AuthCheck User user,
+    public void editReview(@AuthCheck(role = AuthCheck.Role.USER) Long userId,
                            @Valid @RequestBody ReviewEditDto reviewEditDto,
                            @PathVariable Long reviewId) {
-        reviewService.editReview(user, reviewId, reviewEditDto);
+        reviewService.editReview(userId, reviewId, reviewEditDto);
     }
 }

@@ -47,7 +47,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
 class ReviewServiceTest {
     @Autowired
     UserRepository userRepository;
@@ -72,33 +71,27 @@ class ReviewServiceTest {
     @PersistenceContext
     EntityManager em;
 
-    Item item;
 
-    @BeforeEach
-    void beforeEach() {
-        Owner owner = createOwner("test-owner", "test-password");
-        Shop shop = createShop(owner, "test-shop");
-        item = creatItem(shop, "test-item");
-        flushAndClearPersistence();
-    }
 
     @Test
     void 리뷰등록() {
-        User user = createUser("test-user", "test-password");
-        paymentService.increasePoint(user, 10000);
+        Owner owner = createOwner("enroll-test-owner", "test-password");
+        Shop shop = createShop(owner, "enroll-test-shop");
+        Item item = creatItem(shop, "enroll-test-item");
+        User user = createUser("enroll-test-user", "test-password");
+        paymentService.increasePoint(user.getId(), 10000);
 
         CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(item.getId(), 1);
-        cartService.addCartItem(user, cartItemSaveDto);
-        Long orderId = orderService.order(user);
-        OrderDetail orderDetail = orderService.getOrderDetail(user, orderId);
+        cartService.addCartItem(user.getId(), cartItemSaveDto);
+        Long orderId = orderService.order(user.getId());
+        OrderDetail orderDetail = orderService.getOrderDetail(user.getId(), orderId);
 
         List<OrderItemResponse> orderItems = orderDetail.getOrderItems();
         OrderItemResponse orderItemResponse = orderItems.get(0);
 
         ReviewSaveDto reviewSaveDto = new ReviewSaveDto("test-content", new BigDecimal("4.5"));
-        Long reviewId = reviewService.enrollReview(user, reviewSaveDto, orderItemResponse.getOrderItemId());
+        Long reviewId = reviewService.enrollReview(user.getId(), reviewSaveDto, orderItemResponse.getOrderItemId());
 
-        flushAndClearPersistence();
         ReviewInfo reviewInfo = reviewService.getItemReviews(item.getId(), 1, 1).get(0);
 
         assertThat(reviewInfo.getReviewId()).isEqualTo(reviewId);
@@ -109,25 +102,26 @@ class ReviewServiceTest {
 
     @Test
     void 리뷰수정() {
-        User user = createUser("test-user", "test-password");
-        paymentService.increasePoint(user, 10000);
+        Owner owner = createOwner("edit-test-owner", "test-password");
+        Shop shop = createShop(owner, "edit-test-shop");
+        Item item = creatItem(shop, "edit-test-item");
+        User user = createUser("edit-test-user", "test-password");
+        paymentService.increasePoint(user.getId(), 10000);
 
         CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(item.getId(), 1);
-        cartService.addCartItem(user, cartItemSaveDto);
-        Long orderId = orderService.order(user);
-        OrderDetail orderDetail = orderService.getOrderDetail(user, orderId);
+        cartService.addCartItem(user.getId(), cartItemSaveDto);
+        Long orderId = orderService.order(user.getId());
+        OrderDetail orderDetail = orderService.getOrderDetail(user.getId(), orderId);
 
         List<OrderItemResponse> orderItems = orderDetail.getOrderItems();
         OrderItemResponse orderItemResponse = orderItems.get(0);
 
         ReviewSaveDto reviewSaveDto = new ReviewSaveDto("test-content", new BigDecimal("4.5"));
-        Long reviewId = reviewService.enrollReview(user, reviewSaveDto, orderItemResponse.getOrderItemId());
-        flushAndClearPersistence();
+        Long reviewId = reviewService.enrollReview(user.getId(), reviewSaveDto, orderItemResponse.getOrderItemId());
 
         ReviewEditDto reviewEditDto = new ReviewEditDto("change-content", new BigDecimal("4.0"));
-        reviewService.editReview(user, reviewId, reviewEditDto);
+        reviewService.editReview(user.getId(), reviewId, reviewEditDto);
 
-        flushAndClearPersistence();
 
         ReviewInfo reviewInfo = reviewService.getItemReviews(item.getId(), 1, 1).get(0);
 
@@ -138,27 +132,30 @@ class ReviewServiceTest {
 
     @Test
     void 리뷰조회() {
+        Owner owner = createOwner("select-test-owner", "test-password");
+        Shop shop = createShop(owner, "select-test-shop");
+        Item item = creatItem(shop, "select-test-item");
+
         int loopCount = 9;
         List<User> users = new ArrayList<>();
 
         for (int i = 0; i < loopCount; i++) {
-            User user = createUser("test-user-" + i, "test-password-" + i);
-            paymentService.increasePoint(user, 10000);
+            User user = createUser("select-test-user-" + i, "test-password-" + i);
+            paymentService.increasePoint(user.getId(), 10000);
             users.add(user);
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(item.getId(), 1);
-            cartService.addCartItem(user, cartItemSaveDto);
-            Long orderId = orderService.order(user);
-            Long orderItemId = orderService.getOrderDetail(user, orderId).getOrderItems().get(0).getOrderItemId();
+            cartService.addCartItem(user.getId(), cartItemSaveDto);
+            Long orderId = orderService.order(user.getId());
+            Long orderItemId = orderService.getOrderDetail(user.getId(), orderId).getOrderItems().get(0).getOrderItemId();
 
             ReviewSaveDto reviewSaveDto = new ReviewSaveDto("test-content-" + i, new BigDecimal("4.5"));
-            reviewService.enrollReview(user, reviewSaveDto, orderItemId);
+            reviewService.enrollReview(user.getId(), reviewSaveDto, orderItemId);
         }
 
-        flushAndClearPersistence();
 
         for (int i = 0; i < loopCount; i++) {
             User user = users.get(i);
-            List<ReviewInfo> userReviews = reviewService.getUserReviews(user, 1, 5);
+            List<ReviewInfo> userReviews = reviewService.getUserReviews(user.getId(), 1, 5);
             assertThat(userReviews.size()).isEqualTo(1);
             ReviewInfo reviewInfo = userReviews.get(0);
             assertThat(reviewInfo.getReviewId()).isNotNull();
@@ -169,25 +166,26 @@ class ReviewServiceTest {
 
     @Test
     void 리뷰삭제() {
-        User user = createUser("test-user", "test-password");
-        paymentService.increasePoint(user, 10000);
+        Owner owner = createOwner("delete-test-owner", "test-password");
+        Shop shop = createShop(owner, "delete-test-shop");
+        Item item = creatItem(shop, "delete-test-item");
+        User user = createUser("delete-test-user", "test-password");
+        paymentService.increasePoint(user.getId(), 10000);
 
         CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(item.getId(), 1);
-        cartService.addCartItem(user, cartItemSaveDto);
-        Long orderId = orderService.order(user);
-        OrderDetail orderDetail = orderService.getOrderDetail(user, orderId);
+        cartService.addCartItem(user.getId(), cartItemSaveDto);
+        Long orderId = orderService.order(user.getId());
+        OrderDetail orderDetail = orderService.getOrderDetail(user.getId(), orderId);
 
         List<OrderItemResponse> orderItems = orderDetail.getOrderItems();
         OrderItemResponse orderItemResponse = orderItems.get(0);
 
         ReviewSaveDto reviewSaveDto = new ReviewSaveDto("test-content", new BigDecimal("4.5"));
-        Long reviewId = reviewService.enrollReview(user, reviewSaveDto, orderItemResponse.getOrderItemId());
-        flushAndClearPersistence();
+        Long reviewId = reviewService.enrollReview(user.getId(), reviewSaveDto, orderItemResponse.getOrderItemId());
 
         assertThat(reviewService.getItemReviews(item.getId(), 1, 5).size()).isEqualTo(1);
 
-        reviewService.deleteReview(user, reviewId);
-        flushAndClearPersistence();
+        reviewService.deleteReview(user.getId(), reviewId);
 
         Review review = reviewRepository.findById(reviewId).get();
         assertThat(review.getStatus()).isEqualTo(ReviewStatus.DELETED);
@@ -221,7 +219,7 @@ class ReviewServiceTest {
                 .price(1)
                 .shopId(shop.getId())
                 .stock(100000)
-                .category(Category.ETC)
+                .category(Category.TEST)
                 .build();
         ImageFile imageFile = ImageFile.createImageFile(itemName, UUID.randomUUID().toString());
         imageFileRepository.save(imageFile);
@@ -230,8 +228,4 @@ class ReviewServiceTest {
         return itemRepository.save(item);
     }
 
-    private void flushAndClearPersistence() {
-        em.flush();
-        em.clear();
-    }
 }

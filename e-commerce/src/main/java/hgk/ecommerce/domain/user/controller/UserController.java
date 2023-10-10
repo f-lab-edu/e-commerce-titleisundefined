@@ -12,8 +12,10 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import static hgk.ecommerce.domain.common.annotation.AuthCheck.*;
 import static hgk.ecommerce.global.swagger.SwaggerConst.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -45,7 +47,7 @@ public class UserController {
 
     @DeleteMapping("/sign-out")
     @Operation(summary = "유저 회원탈퇴", tags = USER)
-    public void signOut(@AuthCheck User user) {
-        userService.signOut(user);
+    public void signOut(@AuthCheck(role = Role.USER) Long userId) {
+        userService.signOut(userId);
     }
 }

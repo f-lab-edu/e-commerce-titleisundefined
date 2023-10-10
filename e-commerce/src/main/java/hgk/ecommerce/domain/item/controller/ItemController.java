@@ -7,8 +7,6 @@ import hgk.ecommerce.domain.item.dto.request.ItemSaveDto;
 import hgk.ecommerce.domain.item.dto.request.ItemSearch;
 import hgk.ecommerce.domain.item.dto.response.ItemInfo;
 import hgk.ecommerce.domain.item.service.ItemService;
-import hgk.ecommerce.domain.owner.Owner;
-import hgk.ecommerce.global.swagger.SwaggerConst;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +25,10 @@ public class ItemController {
     private final ItemService itemService;
 
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     @Operation(summary = "아이템 검색", tags = USER)
     public List<ItemInfo> getItems(
-            @Valid ItemSearch itemSearch,
+            @RequestBody @Valid ItemSearch itemSearch,
             @RequestParam(defaultValue = "1", required = false) Integer page,
             @RequestParam(defaultValue = "5", required = false) Integer size) {
         return itemService.searchItems(itemSearch, page, size);
@@ -38,30 +36,30 @@ public class ItemController {
 
     @GetMapping("/{shopId}/list")
     @Operation(summary = "가게내 아이템 가져오기", tags = OWNER)
-    public List<ItemInfo> getOwnerShops(@AuthCheck Owner owner,
+    public List<ItemInfo> getOwnerShops(@AuthCheck(role = AuthCheck.Role.OWNER) Long ownerId,
                                         @PathVariable Long shopId,
                                         @RequestParam(defaultValue = "1", required = false) Integer page,
                                         @RequestParam(defaultValue = "5", required = false) Integer size) {
-        return itemService.getItemsByShop(owner, shopId, page, size);
+        return itemService.getItemsByShop(ownerId, shopId, page, size);
     }
 
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "아이템 등록하기", tags = OWNER)
-    public void registerItem(@AuthCheck Owner owner, @Valid ItemSaveDto itemSave) {
-        itemService.enrollItem(owner, itemSave);
+    public void registerItem(@AuthCheck(role = AuthCheck.Role.OWNER) Long ownerId, @Valid ItemSaveDto itemSave) {
+        itemService.enrollItem(ownerId, itemSave);
     }
 
     @PatchMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "아이템 수정", tags = OWNER)
-    public void editItem(@AuthCheck Owner owner,
+    public void editItem(@AuthCheck(role = AuthCheck.Role.OWNER) Long ownerId,
                          @Valid ItemEditDto itemEdit) {
-        itemService.editItem(owner, itemEdit);
+        itemService.editItem(ownerId, itemEdit);
     }
 
     @PutMapping(consumes = MULTIPART_FORM_DATA_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "아이템 이미지 바꾸기", tags = OWNER)
-    public void changeItemImage(@AuthCheck Owner owner,
+    public void changeItemImage(@AuthCheck(role = AuthCheck.Role.OWNER) Long ownerId,
                                 @Valid ItemFileDto itemFileDto) {
-        itemService.changeItemImage(owner, itemFileDto);
+        itemService.changeItemImage(ownerId, itemFileDto);
     }
 }

@@ -11,4 +11,9 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.PARAMETER})
 @Parameter(hidden = true)
 public @interface AuthCheck {
+    enum Role {
+        USER, OWNER,
+    }
+
+    Role role();
 }

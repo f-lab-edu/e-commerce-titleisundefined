@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @EnableCaching
+@Configuration
 public class RedisConfiguration extends AbstractHttpSessionApplicationInitializer {
     @Value("${spring.cache.redis.host}")
     private String redisCacheHost;
@@ -39,7 +40,7 @@ public class RedisConfiguration extends AbstractHttpSessionApplicationInitialize
     @Value("${spring.cache.redis.password}")
     private String redisCachePassword;
 
-    @Bean
+    @Bean(name = "redisCacheConnectionFactory")
     public RedisConnectionFactory redisCacheConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisCacheHost);

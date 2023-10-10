@@ -9,6 +9,7 @@ import hgk.ecommerce.domain.cart.repository.CartRepository;
 import hgk.ecommerce.domain.item.Item;
 import hgk.ecommerce.domain.item.service.ItemService;
 import hgk.ecommerce.domain.user.User;
+import hgk.ecommerce.domain.user.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,10 +24,13 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ItemService itemService;
+    private final UserServiceImpl userService;
 
-    @Transactional(readOnly = true)
-    public List<CartItemInfo> getCartItemsFetchItemByCart(User user) {
+    @Transactional
+    public List<CartItemInfo> getCartItemsFetchItemByCart(Long userId) {
+        User user = userService.getCurrentUserById(userId);
         Cart cart = getCartByUser(user);
+
         List<CartItem> cartItems = getCartItemsFetchItemByCart(cart);
 
         return cartItems.stream()
@@ -34,14 +38,16 @@ public class CartService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<CartItem> getCartItemsEntityFetchItemByCart(User user) {
+    @Transactional
+    public List<CartItem> getCartItemsEntityFetchItemByCart(Long userId) {
+        User user = userService.getCurrentUserById(userId);
         Cart cart = getCartByUser(user);
         return getCartItemsFetchItemByCart(cart);
     }
 
     @Transactional
-    public Long addCartItem(User user, CartItemSaveDto cartItemSaveDto) {
+    public Long addCartItem(Long userId, CartItemSaveDto cartItemSaveDto) {
+        User user = userService.getCurrentUserById(userId);
         Cart cart = getCartByUser(user);
 
         Item item = itemService.getItemEntity(cartItemSaveDto.getItemId());
@@ -63,7 +69,8 @@ public class CartService {
     }
 
     @Transactional
-    public void removeCartItem(User user, Long cartItemId) {
+    public void removeCartItem(Long userId, Long cartItemId) {
+        User user = userService.getCurrentUserById(userId);
         Cart cart = getCartByUser(user);
         List<CartItem> cartItems = getCartItemsFetchItemByCart(cart);
 
@@ -73,14 +80,16 @@ public class CartService {
     }
 
     @Transactional
-    public void clearCart(User user) {
+    public void clearCart(Long userId) {
+        User user = userService.getCurrentUserById(userId);
         Cart cart = getCartByUser(user);
         cartItemRepository.deleteCartItemsByCart(cart);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     protected Cart createCart(User user) {
         Cart cart = Cart.createCart(user);
+
         return cartRepository.save(cart);
     }
 
@@ -99,11 +108,13 @@ public class CartService {
                 .findAny();
     }
 
-    private List<CartItem> getCartItemsFetchItemByCart(Cart cart) {
+    @Transactional(readOnly = true)
+    protected List<CartItem> getCartItemsFetchItemByCart(Cart cart) {
         return cartItemRepository.findCartItemsFetchItemsByCart(cart.getId());
     }
 
-    private Cart getCartByUser(User user) {
+    @Transactional(readOnly = true)
+    protected Cart getCartByUser(User user) {
         Optional<Cart> optionalCart = cartRepository.findCartByUserId(user.getId());
         if (optionalCart.isEmpty()) {
             return createCart(user);

@@ -47,7 +47,7 @@ class PaymentServiceTest {
     @Test
     void 포인트_충전() {
         int chargePoint = 10000;
-        paymentService.increasePoint(user, chargePoint);
+        paymentService.increasePoint(user.getId(), chargePoint);
 
         flushAndClearPersistence();
 
@@ -61,7 +61,7 @@ class PaymentServiceTest {
     @Test
     void 포인트_감소() {
         int chargePoint = 10000;
-        paymentService.increasePoint(user, chargePoint);
+        paymentService.increasePoint(user.getId(), chargePoint);
 
         flushAndClearPersistence();
 
@@ -70,7 +70,7 @@ class PaymentServiceTest {
 
         int dischargePoint = 5000;
 
-        paymentService.decreasePoint(user, dischargePoint);
+        paymentService.decreasePoint(user.getId(), dischargePoint);
         flushAndClearPersistence();
 
         payment = paymentRepository.findPaymentByUserId(user.getId()).get();

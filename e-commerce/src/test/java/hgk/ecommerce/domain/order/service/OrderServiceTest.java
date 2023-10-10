@@ -41,7 +41,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
 class OrderServiceTest {
 
     @Autowired
@@ -62,8 +61,7 @@ class OrderServiceTest {
     OrderService orderService;
     @Autowired
     PaymentService paymentService;
-    @PersistenceContext
-    EntityManager em;
+
 
     User user;
     Owner owner;
@@ -71,42 +69,36 @@ class OrderServiceTest {
     List<Item> items;
     int itemCount = 10;
 
-    @BeforeEach
-    void beforeEach() {
-        user = createUser("test-user", "test-password");
-        owner = createOwner("test-owner", "test-password");
-        shop = createShop("test-shop", owner);
-        items = new ArrayList<>();
+    @Test
+    void 정상_주문() {
+        User user = createUser("order-test-user", "test-password");;
+        Owner owner = createOwner("order-test-owner", "test-password");;
+        Shop shop = createShop("order-test-shop", owner);;
+        List<Item> items = new ArrayList<>();
 
         for (int i = 0; i < itemCount; i++) {
-            Item item = createItem("test-item-" + i, i, shop);
+            Item item = createItem("order-test-item-" + i, i, shop);
             items.add(item);
         }
 
-        flushAndClearPersistence();
-    }
-
-    @Test
-    void 정상_주문() {
         int chargePoint = 1000000;
-        paymentService.increasePoint(user, chargePoint);
+        paymentService.increasePoint(user.getId(), chargePoint);
         int totalPrice = 0;
         for (int i = 1; i < itemCount; i++) {
             Item item = items.get(i);
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(item.getId(), 1);
             totalPrice += cartItemSaveDto.getCount() * item.getPrice();
-            cartService.addCartItem(user, cartItemSaveDto);
+            cartService.addCartItem(user.getId(), cartItemSaveDto);
         }
 
-        Long orderId = orderService.order(user);
-        assertThat(cartService.getCartItemsFetchItemByCart(user).size()).isEqualTo(0);
-        OrderDetail orderInfo = (OrderDetail) orderService.getOrderDetail(user, orderId);
+        Long orderId = orderService.order(user.getId());
+        assertThat(cartService.getCartItemsFetchItemByCart(user.getId()).size()).isEqualTo(0);
+        OrderDetail orderInfo = (OrderDetail) orderService.getOrderDetail(user.getId(), orderId);
 
         assertThat(orderInfo.getOrderId()).isEqualTo(orderId);
         assertThat(orderInfo.getOrderStatus()).isEqualTo(ORDERED);
         List<OrderItemResponse> orderItems = orderInfo.getOrderItems();
 
-        flushAndClearPersistence();
         for (int i = 0; i < orderItems.size(); i++) {
             Item item = items.get(i + 1);
             OrderItemResponse orderItemResponse = orderItems.get(i);
@@ -121,17 +113,26 @@ class OrderServiceTest {
 
     @Test
     void 주문_취소() {
+        User user = createUser("cancel-test-user", "test-password");;
+        Owner owner = createOwner("cancel-test-owner", "test-password");;
+        Shop shop = createShop("cancel-test-shop", owner);;
+        List<Item> items = new ArrayList<>();
+
+        for (int i = 0; i < itemCount; i++) {
+            Item item = createItem("cancel-test-item-" + i, i, shop);
+            items.add(item);
+        }
+
         int chargePoint = 1000000;
-        paymentService.increasePoint(user, chargePoint);
+        paymentService.increasePoint(user.getId(), chargePoint);
 
         for (int i = 1; i < itemCount; i++) {
             Item item = items.get(i);
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(item.getId(), 1);
-            cartService.addCartItem(user, cartItemSaveDto);
+            cartService.addCartItem(user.getId(), cartItemSaveDto);
         }
 
-        Long orderId = orderService.order(user);
-        flushAndClearPersistence();
+        Long orderId = orderService.order(user.getId());
 
         for (int i = 1; i < itemCount; i++) {
             Item item = itemRepository.findById(items.get(i).getId()).get();
@@ -139,8 +140,7 @@ class OrderServiceTest {
             assertThat(item.getStock()).isEqualTo(items.get(i).getStock() - 1);
         }
 
-        orderService.cancelOrder(user, orderId);
-        flushAndClearPersistence();
+        orderService.cancelOrder(user.getId(), orderId);
 
         for (int i = 1; i < itemCount; i++) {
             Item item = itemRepository.findById(items.get(i).getId()).get();
@@ -182,7 +182,7 @@ class OrderServiceTest {
                 .description(itemName)
                 .stock(i)
                 .price(i)
-                .category(Category.ETC)
+                .category(Category.TEST)
                 .shopId(shop.getId())
                 .file(new MockMultipartFile(itemName, new byte[]{0x00}))
                 .build();
@@ -193,8 +193,4 @@ class OrderServiceTest {
         return itemRepository.save(item);
     }
 
-    private void flushAndClearPersistence() {
-        em.flush();
-        em.clear();
-    }
 }

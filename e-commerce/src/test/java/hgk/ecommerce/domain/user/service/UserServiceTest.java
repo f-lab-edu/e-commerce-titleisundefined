@@ -190,7 +190,7 @@ class UserServiceTest {
 
         flushAndClearPersistence();
         User user = getUserByLoginId(signUpDto);
-        userService.signOut(user);
+        userService.signOut(user.getId());
         flushAndClearPersistence();
 
         UserLoginDto loginDto = UserLoginDto.builder()
@@ -219,7 +219,7 @@ class UserServiceTest {
 
         flushAndClearPersistence();
         User user = getUserByLoginId(signUpDto);
-        userService.signOut(user);
+        userService.signOut(user.getId());
         flushAndClearPersistence();
 
 

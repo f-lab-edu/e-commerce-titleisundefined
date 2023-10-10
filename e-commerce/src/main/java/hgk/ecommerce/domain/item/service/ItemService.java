@@ -15,6 +15,7 @@ import hgk.ecommerce.domain.item.dto.response.ItemInfo;
 import hgk.ecommerce.domain.item.dto.enums.Category;
 import hgk.ecommerce.domain.item.repository.ItemRepository;
 import hgk.ecommerce.domain.owner.Owner;
+import hgk.ecommerce.domain.owner.service.OwnerService;
 import hgk.ecommerce.domain.review.repository.ReviewRepository;
 import hgk.ecommerce.domain.review.service.ReviewService;
 import hgk.ecommerce.domain.shop.Shop;
@@ -23,10 +24,12 @@ import hgk.ecommerce.global.storage.ImageFile;
 import hgk.ecommerce.global.storage.QImageFile;
 import hgk.ecommerce.global.storage.service.ImageFileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,9 +46,11 @@ public class ItemService {
     private final JPAQueryFactory jpaQueryFactory;
     private final ReviewRepository reviewRepository;
     private final ImageFileService imageFileService;
+    private final OwnerService ownerService;
 
     @Transactional(readOnly = true)
-    public List<ItemInfo> getItemsByShop(Owner owner, Long shopId, Integer page, Integer count) {
+    public List<ItemInfo> getItemsByShop(Long ownerId, Long shopId, Integer page, Integer count) {
+        Owner owner = ownerService.getCurrentOwnerById(ownerId);
         Shop shop = shopService.getShopEntity(shopId);
         checkAuth(shop.getOwner().getId(), owner.getId());
 
@@ -54,7 +59,7 @@ public class ItemService {
         Page<Item> items = itemRepository.findItemsByShopId(shop.getId(), paging);
 
         return items.stream()
-                .map(item -> new ItemInfo(item, getAverageScoreByItemId(item)))
+                .map(item -> new ItemInfo(item, getAverageScore(item)))
                 .toList();
     }
 
@@ -63,8 +68,12 @@ public class ItemService {
         List<Item> items = findItems(itemSearch, page, count);
 
         return items.stream()
-                .map(item -> new ItemInfo(item, getAverageScoreByItemId(item)))
+                .map(item -> new ItemInfo(item, getAverageScore(item)))
                 .toList();
+    }
+
+    public BigDecimal getAverageScore(Item item) {
+        return reviewRepository.getAverageScoreByItemId(item.getId());
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +84,8 @@ public class ItemService {
     }
 
     @Transactional
-    public Long enrollItem(Owner owner, ItemSaveDto itemSaveDto) {
+    public Long enrollItem(Long ownerId, ItemSaveDto itemSaveDto) {
+        Owner owner = ownerService.getCurrentOwnerById(ownerId);
         Shop shop = shopService.getShopEntity(itemSaveDto.getShopId());
         checkAuth(shop.getOwner().getId(), owner.getId());
 
@@ -88,7 +98,8 @@ public class ItemService {
     }
 
     @Transactional
-    public void editItem(Owner owner, ItemEditDto itemEditDto) {
+    public void editItem(Long ownerId, ItemEditDto itemEditDto) {
+        Owner owner = ownerService.getCurrentOwnerById(ownerId);
         Item item = getItemFetchShop(itemEditDto.getItemId());
         checkAuth(item.getShop().getOwner().getId(), owner.getId());
 
@@ -96,9 +107,8 @@ public class ItemService {
     }
 
     @RedisLock(key = "#itemId")
-    public void increaseStock(Long itemId, Integer quantity) {
-        Item item = getItemEntity(itemId);
-
+    public synchronized void increaseStock(Long itemId, Integer quantity) {
+        Item item = itemRepository.findItemWithLock(itemId).get();
         item.increaseStock(quantity);
     }
 
@@ -110,7 +120,8 @@ public class ItemService {
     }
 
     @Transactional
-    public void changeItemImage(Owner owner, ItemFileDto itemFileDto) {
+    public void changeItemImage(Long ownerId, ItemFileDto itemFileDto) {
+        Owner owner = ownerService.getCurrentOwnerById(ownerId);
         Item item = getItemFetchShop(itemFileDto.getItemId());
         checkAuth(owner.getId(), item.getShop().getOwner().getId());
 
@@ -152,10 +163,6 @@ public class ItemService {
 
     private BooleanExpression categoryCond(Category category) {
         return category != null ? QItem.item.category.eq(category) : null;
-    }
-
-    private BigDecimal getAverageScoreByItemId(Item item) {
-        return reviewRepository.getAverageScoreByItemId(item.getId());
     }
 
     private BooleanExpression titleCond(String title) {

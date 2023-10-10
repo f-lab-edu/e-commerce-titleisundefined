@@ -18,7 +18,7 @@ public class ItemSearch {
     @Nullable
     private String name;
 
-    @Schema(name = "category", allowableValues = {"BOOK", "CLOTHES", "ALBUM", "ELECTRONICS", "FOOD", "ETC"})
+    @Schema(name = "category", allowableValues = {"BOOK", "CLOTHES", "ALBUM", "ELECTRONIC", "FOOD", "ETC"})
     @Nullable
     private Category category;
 

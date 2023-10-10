@@ -8,6 +8,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableCaching
 public class ECommerceApplication {
 
     public static void main(String[] args) {

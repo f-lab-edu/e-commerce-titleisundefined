@@ -1,10 +1,12 @@
 package hgk.ecommerce.domain.order.service;
 
 import hgk.ecommerce.domain.cart.CartItem;
+import hgk.ecommerce.domain.cart.dto.request.CartItemSaveDto;
 import hgk.ecommerce.domain.cart.service.CartService;
 import hgk.ecommerce.domain.common.exceptions.AuthenticationException;
 import hgk.ecommerce.domain.common.exceptions.InvalidRequest;
 import hgk.ecommerce.domain.common.exceptions.NoResourceException;
+import hgk.ecommerce.domain.common.service.SessionService;
 import hgk.ecommerce.domain.item.repository.ItemRepository;
 import hgk.ecommerce.domain.item.service.ItemService;
 import hgk.ecommerce.domain.order.Order;
@@ -15,6 +17,8 @@ import hgk.ecommerce.domain.order.repository.OrderItemRepository;
 import hgk.ecommerce.domain.order.repository.OrderRepository;
 import hgk.ecommerce.domain.payment.service.PaymentService;
 import hgk.ecommerce.domain.user.User;
+import hgk.ecommerce.domain.user.service.UserService;
+import hgk.ecommerce.domain.user.service.UserServiceImpl;
 import hgk.ecommerce.global.storage.ImageFile;
 import hgk.ecommerce.global.storage.repository.ImageFileRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,17 +42,20 @@ public class OrderService {
     private final CartService cartService;
     private final PaymentService paymentService;
     private final ItemService itemService;
+    private final UserServiceImpl userService;
 
     @Transactional(readOnly = true)
-    public List<OrderInfo> getOrderInfo(User user, Integer page, Integer count) {
+    public List<OrderInfo> getOrderInfo(Long userId, Integer page, Integer count) {
+        User user = userService.getCurrentUserById(userId);
         PageRequest pageRequest = PageRequest.of(page - 1, count, DESC, "createDate");
-        Page<Order> orders = orderRepository.findAll(pageRequest);
+        Page<Order> orders = orderRepository.findOrdersByUser(user, pageRequest);
 
         return orders.stream().map(OrderInfo::new).toList();
     }
 
     @Transactional(readOnly = true)
-    public OrderDetail getOrderDetail(User user, Long orderId) {
+    public OrderDetail getOrderDetail(Long userId, Long orderId) {
+        User user = userService.getCurrentUserById(userId);
         Order order = getOrderById(orderId);
 
         checkOrderAuth(user, order);
@@ -59,8 +66,9 @@ public class OrderService {
 
 
     @Transactional
-    public Long order(User user) {
-        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user);
+    public Long order(Long userId) {
+        User user = userService.getCurrentUserById(userId);
+        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user.getId());
 
         if(cartItems.isEmpty()) {
             throw new InvalidRequest("카트가 비어있습니다.", HttpStatus.BAD_REQUEST);
@@ -68,19 +76,20 @@ public class OrderService {
 
         int totalPrice = cartItemsTotalPrice(cartItems);
 
-        paymentService.decreasePoint(user, totalPrice);
+        paymentService.decreasePoint(user.getId(), totalPrice);
 
         Order order = Order.createOrder(user);
         orderRepository.save(order);
         proceedOrderFromCartItems(order, cartItems);
 
-        cartService.clearCart(user);
+        cartService.clearCart(user.getId());
 
         return order.getId();
     }
 
     @Transactional
-    public void cancelOrder(User user, Long orderId) {
+    public void cancelOrder(Long userId, Long orderId) {
+        User user = userService.getCurrentUserById(userId);
         Order order = getOrderById(orderId);
 
         checkOrderAuth(user, order);
@@ -92,7 +101,7 @@ public class OrderService {
         List<OrderItem> orderItems = orderItemRepository.findOrderItemsFetchItemByOrderId(order.getId());
         int totalPrice = orderItemsTotalPrice(orderItems);
 
-        paymentService.increasePoint(user, totalPrice);
+        paymentService.increasePoint(user.getId(), totalPrice);
         cancelOrderFromOrderItems(orderItems);
         order.changeStatus(CANCEL);
     }
@@ -145,6 +154,8 @@ public class OrderService {
             orderItemRepository.save(orderItem);
         });
     }
+
+
 
     //endregion
 }

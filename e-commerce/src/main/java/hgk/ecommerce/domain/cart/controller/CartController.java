@@ -24,25 +24,25 @@ public class CartController {
 
     @GetMapping
     @Operation(summary = "장바구니 조회", tags = USER)
-    public List<CartItemInfo> getCartItems(@AuthCheck User user) {
-        return cartService.getCartItemsFetchItemByCart(user);
+    public List<CartItemInfo> getCartItems(@AuthCheck(role = AuthCheck.Role.USER) Long userId) {
+        return cartService.getCartItemsFetchItemByCart(userId);
     }
 
     @PostMapping
     @Operation(summary = "장바구니 추가", tags = USER)
-    public void addCartItem(@AuthCheck User user, @Valid @RequestBody CartItemSaveDto cartItemSaveDto) {
-        cartService.addCartItem(user, cartItemSaveDto);
+    public void addCartItem(@AuthCheck(role = AuthCheck.Role.USER) Long userId, @Valid @RequestBody CartItemSaveDto cartItemSaveDto) {
+        cartService.addCartItem(userId, cartItemSaveDto);
     }
 
     @DeleteMapping("/{cartItemId}")
     @Operation(summary = "장바구니 수량 감소", tags = USER)
-    public void deleteCartItem(@AuthCheck User user, @PathVariable Long cartItemId) {
-        cartService.removeCartItem(user, cartItemId);
+    public void deleteCartItem(@AuthCheck(role = AuthCheck.Role.USER) Long userId, @PathVariable Long cartItemId) {
+        cartService.removeCartItem(userId, cartItemId);
     }
 
     @DeleteMapping
     @Operation(summary = "장바구니 아이템 모두삭제", tags = USER)
-    public void clearCart(@AuthCheck User user) {
-        cartService.clearCart(user);
+    public void clearCart(@AuthCheck(role = AuthCheck.Role.USER) Long userId) {
+        cartService.clearCart(userId);
     }
 }

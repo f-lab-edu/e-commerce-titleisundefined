@@ -13,6 +13,7 @@ import hgk.ecommerce.domain.review.dto.response.ReviewInfo;
 import hgk.ecommerce.domain.review.repository.ReviewRepository;
 import hgk.ecommerce.domain.user.User;
 import hgk.ecommerce.domain.user.dto.enums.Status;
+import hgk.ecommerce.domain.user.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ import static org.springframework.data.domain.Sort.Direction.*;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final OrderService orderService;
+    private final UserServiceImpl userService;
 
     @Transactional(readOnly = true)
     public List<ReviewInfo> getItemReviews(Long itemId, Integer page, Integer count) {
@@ -46,7 +48,8 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewInfo> getUserReviews(User user, Integer page, Integer count) {
+    public List<ReviewInfo> getUserReviews(Long userId, Integer page, Integer count) {
+        User user = userService.getCurrentUserById(userId);
         PageRequest paging = PageRequest.of(page - 1, count, DESC, "createDate");
         Page<Review> reviews = reviewRepository.findReviewsByUserIdAndStatusIs(user.getId(), ACTIVE, paging);
 
@@ -56,7 +59,8 @@ public class ReviewService {
     }
 
     @Transactional
-    public Long enrollReview(User user, ReviewSaveDto reviewSaveDto, Long orderItemId) {
+    public Long enrollReview(Long userId, ReviewSaveDto reviewSaveDto, Long orderItemId) {
+        User user = userService.getCurrentUserById(userId);
         OrderItem orderItem = orderService.getOrderItemById(orderItemId);
         Order order = orderItem.getOrder();
 
@@ -69,7 +73,8 @@ public class ReviewService {
     }
 
     @Transactional
-    public void editReview(User user, Long reviewId, ReviewEditDto reviewEditDto) {
+    public void editReview(Long userId, Long reviewId, ReviewEditDto reviewEditDto) {
+        User user = userService.getCurrentUserById(userId);
         Review review = getReviewById(reviewId);
         checkReviewAuth(user, review);
 
@@ -77,20 +82,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(User user, Long reviewId) {
+    public void deleteReview(Long userId, Long reviewId) {
+        User user = userService.getCurrentUserById(userId);
         Review review = getReviewById(reviewId);
         checkReviewAuth(user, review);
 
         review.deleteReview();
     }
 
-    @Transactional(readOnly = true)
-    @Cacheable(value ="reviews", key = "#itemId",
-    unless = "#result == null")
-    public BigDecimal getAverageScore(Long itemId) {
-        return new BigDecimal("4." + itemId.intValue());
-        //return reviewRepository.getAverageScoreByItemId(itemId);
-    }
 
     //region PRIVATE METHOD
 

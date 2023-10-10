@@ -86,12 +86,12 @@ class CartServiceTest {
 
         for (int i = 0; i < loopCount; i++) {
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(items.get(i).getId(), i + 1);
-            cartService.addCartItem(user, cartItemSaveDto);
+            cartService.addCartItem(user.getId(), cartItemSaveDto);
         }
 
         flushAndClearPersistence();
 
-        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user);
+        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user.getId());
 
         int size = cartItems.size();
         assertThat(size).isEqualTo(loopCount);
@@ -114,12 +114,12 @@ class CartServiceTest {
 
         for (int i = 0; i < loopCount; i++) {
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(items.get(i).getId(), i + 1);
-            cartService.addCartItem(user, cartItemSaveDto);
+            cartService.addCartItem(user.getId(), cartItemSaveDto);
         }
 
         flushAndClearPersistence();
 
-        List<CartItemInfo> cartItemInfos = cartService.getCartItemsFetchItemByCart(user);
+        List<CartItemInfo> cartItemInfos = cartService.getCartItemsFetchItemByCart(user.getId());
 
         for (int i = 0; i < loopCount; i++) {
             CartItemInfo cartItemInfo = cartItemInfos.get(i);
@@ -138,17 +138,17 @@ class CartServiceTest {
 
         for (int i = 0; i < loopCount; i++) {
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(items.get(i).getId(), i + 1);
-            cartService.addCartItem(user, cartItemSaveDto);
+            cartService.addCartItem(user.getId(), cartItemSaveDto);
         }
         flushAndClearPersistence();
 
-        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user);
+        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user.getId());
         assertThat(cartItems.size()).isEqualTo(loopCount);
 
         flushAndClearPersistence();
-        cartService.clearCart(user);
+        cartService.clearCart(user.getId());
 
-        assertThat(cartService.getCartItemsEntityFetchItemByCart(user).size()).isEqualTo(0);
+        assertThat(cartService.getCartItemsEntityFetchItemByCart(user.getId()).size()).isEqualTo(0);
     }
 
     @Test
@@ -157,22 +157,22 @@ class CartServiceTest {
         ArrayList<Long> cartItemIds = new ArrayList<>(loopCount);
         for (int i = 0; i < loopCount; i++) {
             CartItemSaveDto cartItemSaveDto = new CartItemSaveDto(items.get(i).getId(), i + 1);
-            cartItemIds.add(cartService.addCartItem(user, cartItemSaveDto));
+            cartItemIds.add(cartService.addCartItem(user.getId(), cartItemSaveDto));
         }
 
         flushAndClearPersistence();
 
-        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user);
+        List<CartItem> cartItems = cartService.getCartItemsEntityFetchItemByCart(user.getId());
         assertThat(cartItems.size()).isEqualTo(loopCount);
 
         int deleteCount = 5;
         for (int i = 0; i < deleteCount; i++) {
-            cartService.removeCartItem(user, cartItemIds.get(i));
+            cartService.removeCartItem(user.getId(), cartItemIds.get(i));
         }
 
         flushAndClearPersistence();
 
-        assertThat(cartService.getCartItemsFetchItemByCart(user).size()).isEqualTo(loopCount - deleteCount);
+        assertThat(cartService.getCartItemsFetchItemByCart(user.getId()).size()).isEqualTo(loopCount - deleteCount);
     }
 
     //region PRIVATE METHOD

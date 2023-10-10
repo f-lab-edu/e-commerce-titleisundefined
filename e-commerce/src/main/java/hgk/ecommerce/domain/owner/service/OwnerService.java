@@ -44,6 +44,13 @@ public class OwnerService {
 
     //region PRIVATE METHOD
 
+    @Transactional(readOnly = true)
+    public Owner getCurrentOwnerById(Long ownerId) {
+        return ownerRepository.findById(ownerId).orElseThrow(() -> {
+            throw new AuthorizationException("로그인 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+        });
+    }
+
     private Owner getOwnerByLoginId(OwnerLoginDto ownerLoginDto) {
         return ownerRepository.findOwnerByLoginId(ownerLoginDto.getLoginId()).orElseThrow(() -> {
             throw new AuthorizationException("아이디를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);

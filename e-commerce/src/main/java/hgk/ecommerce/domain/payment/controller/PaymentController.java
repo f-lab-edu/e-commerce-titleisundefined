@@ -27,8 +27,8 @@ public class PaymentController {
 
     @PostMapping("/charge")
     @Operation(summary = "포인트 충전", tags = USER)
-    public void chargePoint(@AuthCheck User user, @Valid @RequestBody ChargeRequestDto chargeRequestDto) {
-        paymentService.increasePoint(user, chargeRequestDto.getPoint());
+    public void chargePoint(@AuthCheck(role = AuthCheck.Role.USER) Long userId, @Valid @RequestBody ChargeRequestDto chargeRequestDto) {
+        paymentService.increasePoint(userId, chargeRequestDto.getPoint());
     }
 
     @Getter

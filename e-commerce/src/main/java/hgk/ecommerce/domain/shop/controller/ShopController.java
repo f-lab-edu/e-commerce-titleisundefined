@@ -24,16 +24,16 @@ public class ShopController {
 
     @GetMapping
     @Operation(summary = "본인 가게 검색", tags = OWNER)
-    public List<ShopInfo> getShopList(@AuthCheck Owner owner,
+    public List<ShopInfo> getShopList(@AuthCheck(role = AuthCheck.Role.OWNER) Long ownerId,
                                       @RequestParam(defaultValue = "1") Integer page,
                                       @RequestParam(defaultValue = "5") Integer count) {
-        return shopService.getShops(owner, page, count);
+        return shopService.getShops(ownerId, page, count);
     }
 
     @PostMapping
     @Operation(summary = "가게 등록", tags = OWNER)
-    public void enrollShop(@AuthCheck Owner owner,
+    public void enrollShop(@AuthCheck(role = AuthCheck.Role.OWNER) Long ownerId,
                            @Valid @RequestBody ShopSaveDto shopSaveDto) {
-        shopService.enrollShop(owner, shopSaveDto);
+        shopService.enrollShop(ownerId, shopSaveDto);
     }
 }

@@ -45,20 +45,20 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public void signOut(User user) {
-        User currentUser = getCurrentUserById(user.getId());
+    public void signOut(Long userId) {
+        User currentUser = getCurrentUserById(userId);
         currentUser.deleteUser();
         sessionService.logout();
     }
 
     @Override
-    public void logout(User user) {
+    public void logout(Long userId) {
         sessionService.logout();
     }
 
     //region PRIVATE METHOD
 
-    private User getCurrentUserById(Long userId) {
+    public User getCurrentUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
             throw new AuthorizationException("로그인 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
         });

@@ -8,6 +8,6 @@ import hgk.ecommerce.domain.user.dto.request.UserSignUpDto;
 public interface UserService {
     void login(UserLoginDto userLoginDto);
     void signUp(UserSignUpDto userSignUpDto);
-    void signOut(@AuthCheck User user);
-    void logout(@AuthCheck User user);
+    void signOut(Long userId);
+    void logout(Long userId);
 }

@@ -1,42 +1,38 @@
 package hgk.ecommerce.domain.common.service;
 
 import hgk.ecommerce.domain.common.exceptions.AuthorizationException;
-import hgk.ecommerce.domain.owner.Owner;
 import hgk.ecommerce.domain.owner.repository.OwnerRepository;
-import hgk.ecommerce.domain.user.User;
 import hgk.ecommerce.domain.user.repository.UserRepository;
 import hgk.ecommerce.global.utils.SessionUtils;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import static hgk.ecommerce.global.utils.SessionUtils.SessionRole.*;
 
 @Service
 @RequiredArgsConstructor
 public class SessionService {
-    private final OwnerRepository ownerRepository;
-    private final UserRepository userRepository;
     private final HttpSession httpSession;
 
-    @Transactional(readOnly = true)
-    public Owner getCurrentOwner() {
-        Long ownerId = SessionUtils.getSession(httpSession, OWNER);
+    public Long getCurrentOwnerId() {
+        Long ownerId = getSessionValue(OWNER);
 
-        return ownerRepository.findById(ownerId).orElseThrow(() -> {
+        if(ownerId == null) {
             throw new AuthorizationException("로그인 정보가 없습니다.", HttpStatus.BAD_REQUEST);
-        });
+        }
+
+        return ownerId;
     }
 
-    @Transactional(readOnly = true)
-    public User getCurrentUser() {
-        Long ownerId = SessionUtils.getSession(httpSession, USER);
+    public Long getCurrentUserId() {
+        Long userId = getSessionValue(USER);
 
-        return userRepository.findById(ownerId).orElseThrow(() -> {
+        if(userId == null) {
             throw new AuthorizationException("로그인 정보가 없습니다.", HttpStatus.BAD_REQUEST);
-        });
+        }
+        return userId;
     }
 
     public void logout() {

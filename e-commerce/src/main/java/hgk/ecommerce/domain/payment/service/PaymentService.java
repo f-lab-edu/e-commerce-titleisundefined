@@ -3,6 +3,7 @@ package hgk.ecommerce.domain.payment.service;
 import hgk.ecommerce.domain.payment.Payment;
 import hgk.ecommerce.domain.payment.repository.PaymentRepository;
 import hgk.ecommerce.domain.user.User;
+import hgk.ecommerce.domain.user.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,16 +15,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
-
+    private final UserServiceImpl userService;
     @Transactional
-    public void increasePoint(User user, Integer point) {
+    public void increasePoint(Long userId, Integer point) {
+        User user = userService.getCurrentUserById(userId);
         Payment payment = getPaymentByUser(user);
 
         payment.increasePoint(point);
     }
 
     @Transactional
-    public void decreasePoint(User user, Integer point) {
+    public void decreasePoint(Long userId, Integer point) {
+        User user = userService.getCurrentUserById(userId);
         Payment payment = getPaymentByUser(user);
         payment.decreasePoint(point);
     }

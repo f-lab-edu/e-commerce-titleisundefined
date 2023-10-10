@@ -1,16 +1,21 @@
 package hgk.ecommerce.global.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.util.Collections;
@@ -20,6 +25,7 @@ import java.util.Map;
 
 @Configuration
 @Profile("release")
+@Slf4j
 public class DataSourceConfig {
     private static final String MASTER_DATASOURCE = "masterDataSource";
     private static final String SLAVE_DATASOURCE = "slaveDataSource";
@@ -38,6 +44,17 @@ public class DataSourceConfig {
         return DataSourceBuilder.create()
                 .type(HikariDataSource.class)
                 .build();
+    }
+
+
+    @Bean(name = "masterTransactionTemplate")
+    public TransactionTemplate masterTransactionTemplate(@Qualifier(MASTER_DATASOURCE) DataSource dataSource) {
+        return new TransactionTemplate(new DataSourceTransactionManager(dataSource));
+    }
+
+    @Bean(name = "slaveTransactionTemplate")
+    public TransactionTemplate slaveTransactionTemplate(@Qualifier(SLAVE_DATASOURCE) DataSource dataSource) {
+        return new TransactionTemplate(new DataSourceTransactionManager(dataSource));
     }
 
     @Bean
@@ -67,7 +84,7 @@ public class DataSourceConfig {
         @Override
         protected Object determineCurrentLookupKey() {
             boolean isReadOnly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
-
+//            log.info("readonly = {}", isReadOnly);
             return isReadOnly ? "slave" : "master";
         }
     }

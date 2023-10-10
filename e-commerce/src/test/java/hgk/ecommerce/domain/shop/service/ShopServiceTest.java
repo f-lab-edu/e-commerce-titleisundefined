@@ -50,11 +50,11 @@ class ShopServiceTest {
     @Test
     void 정상_등록() {
         ShopSaveDto shopSaveDto = createShopSaveForm("owner-a");
-        shopService.enrollShop(ownerA, shopSaveDto);
+        shopService.enrollShop(ownerA.getId(), shopSaveDto);
 
         flushAndClearPersistence();
 
-        List<ShopInfo> shops = shopService.getShops(ownerA, 1, 5);
+        List<ShopInfo> shops = shopService.getShops(ownerA.getId(), 1, 5);
         assertThat(shops.size()).isEqualTo(1);
         ShopInfo shopInfo = shops.get(0);
 
@@ -66,11 +66,11 @@ class ShopServiceTest {
     @Test
     void 중복_이름_등록() {
         ShopSaveDto shopSaveDto = createShopSaveForm("owner-a");
-        shopService.enrollShop(ownerA, shopSaveDto);
+        shopService.enrollShop(ownerA.getId(), shopSaveDto);
 
         flushAndClearPersistence();
 
-        assertThatThrownBy(() -> shopService.enrollShop(ownerA, shopSaveDto))
+        assertThatThrownBy(() -> shopService.enrollShop(ownerA.getId(), shopSaveDto))
                 .isInstanceOf(DuplicatedException.class);
     }
 
@@ -86,15 +86,15 @@ class ShopServiceTest {
 
         for (int i = 0; i < loopCount; i++) {
             ShopSaveDto shopSaveForm = createShopSaveForm("test-name-" + i);
-            shopService.enrollShop(ownerA, shopSaveForm);
+            shopService.enrollShop(ownerA.getId(), shopSaveForm);
             shopSaveDtos.add(shopSaveForm);
         }
 
         flushAndClearPersistence();
 
-        assertThat(shopService.getShops(ownerA, 1, loopCount).size()).isEqualTo(loopCount);
-        assertThat(shopService.getShops(ownerA, 1, loopCount + 1).size()).isEqualTo(loopCount);
-        assertThat(shopService.getShops(ownerA, 1, loopCount - 1).size()).isEqualTo(loopCount - 1);
+        assertThat(shopService.getShops(ownerA.getId(), 1, loopCount).size()).isEqualTo(loopCount);
+        assertThat(shopService.getShops(ownerA.getId(), 1, loopCount + 1).size()).isEqualTo(loopCount);
+        assertThat(shopService.getShops(ownerA.getId(), 1, loopCount - 1).size()).isEqualTo(loopCount - 1);
 
     }
 
